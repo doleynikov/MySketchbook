@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+//<<<<<<< HEAD
 // This is for compatibility with both arduino 1.0 and previous versions
 //#include <Arduino.h>
 #include <Wire.h>
@@ -12,7 +12,7 @@
 //char pass[] = "maomaomao";       // your network password
 
 char ssid[] = "yuterra.main";  //  your network SSID (name)
-char pass[] = "apwh46fds";       // your network password
+char pass[] = "Papwh46fds";       // your network password
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 IPAddress timeServerIP;
