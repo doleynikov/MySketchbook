@@ -1,4 +1,3 @@
-
 // This is for compatibility with both arduino 1.0 and previous versions
 //#include <Arduino.h>
 #include <Wire.h>
