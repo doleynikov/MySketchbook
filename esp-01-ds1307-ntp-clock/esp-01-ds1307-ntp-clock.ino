@@ -1,4 +1,3 @@
-
 // This is for compatibility with both arduino 1.0 and previous versions
 //#include <Arduino.h>
 #include <Wire.h>
@@ -282,10 +281,10 @@ void write_RTC() {
   char value = 0;
   char command = 0;
   command = Serial.read();
-  delay(50);				//delay to allow good serial port reading
-  value = byte((Serial.read() - 48) * 10); 	//-48 becaus ASCII value for 0 is 48, 1 is 49, etc and *10 because we read tens first
+  delay(50);                            //delay to allow good serial port reading
+  value = byte((Serial.read() - 48) * 10);      //-48 becaus ASCII value for 0 is 48, 1 is 49, etc and *10 because we read tens first
   delay(50);
-  value += byte((Serial.read() - 48));		//and then we read units
+  value += byte((Serial.read() - 48));          //and then we read units
   switch (command) {
     case 'h' :
       Hour = value;
