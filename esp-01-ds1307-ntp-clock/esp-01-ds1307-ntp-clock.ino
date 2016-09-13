@@ -1,4 +1,17 @@
+/* Итак, какие функции хочу:
+1) собственно, вывод времени и фазы луны на дисплей
+  1.1) функция чтения времени из RTC (DataRead)
+  1.2) вывода времени на дисплей     (DataDisplay)
+  1.3) расчета фазы луны по дате и времени (getPhase)
+  1.4) вывод фазы луны
+2)запрос времени по NTP и с Serial или клавиатуры
+  2.1) ввод и запоминание ntp сервера с клавиатуры или с Serial
+  2.2) ввод и запоминание имени точки доступа и пароля с Serial или клавиатуры
+  2.3) запрос времени по NTP
+  2.4) установка времени RTC
+   
 
+*/
 // This is for compatibility with both arduino 1.0 and previous versions
 //#include <Arduino.h>
 #include <Wire.h>
@@ -32,8 +45,7 @@ int bl = 0;
 
 int Hour = 0; int Minute = 0; int Second = 0; int Year = 0; int Month = 0; int Day = 0;
 
-byte degree[8]  =
-{
+byte degree[8]  ={
   B01000,
   B10100,
   B01000,
