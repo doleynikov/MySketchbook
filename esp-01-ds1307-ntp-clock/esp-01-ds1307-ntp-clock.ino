@@ -1,17 +1,18 @@
+
 // This is for compatibility with both arduino 1.0 and previous versions
 //#include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#define printByte(args)  write(args);
 #include "RTClib.h"
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#define printByte(args)  write(args);
 
 //char ssid[] = "mao";  //  your network SSID (name)
 //char pass[] = "maomaomao";       // your network password
 
-char ssid[] = "Pyuterra.main";  //  your network SSID (name)
-char pass[] = "Papwh46fds";       // your network password
+char ssid[] = "yuterra.main";  //  your network SSID (name)
+char pass[] = "apwh46fds";       // your network password
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 IPAddress timeServerIP;
@@ -20,9 +21,15 @@ const char* ntpServerName = "ntp.yuterra.ru";
 int TZ = 3;
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[ NTP_PACKET_SIZE];
+WiFiUDP udp;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
 int eval1 = 0;
 int bl = 0;
+
 int Hour = 0; int Minute = 0; int Second = 0; int Year = 0; int Month = 0; int Day = 0;
 
 byte degree[8]  =
@@ -113,10 +120,6 @@ byte moon[8][8] = {
   }
 };
 
-WiFiUDP udp;
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-RTC_DS1307 rtc;
-
 void setup() {
   Wire.begin(0, 2);
   lcd.init();                      // initialize the lcd
@@ -126,8 +129,7 @@ void setup() {
   lcd.createChar(0, degree);
   lcd.print("Starting...");
   Serial.begin(9600);
- 
- if (! rtc.begin()) {
+  if (! rtc.begin()) {
     Serial.println("Couldn't find RTC");
     lcd.setCursor(0, 0); // устанавливаем позицию курсора на экране (на один символ правее левого верхнего угла)
 
@@ -160,9 +162,11 @@ void loop() {
   if (Serial.available()) {
     write_RTC();
   }
+
   DataRead ();
   DataDisplay();
   delay (10);
+
 }
 
 char getPhase(int Y, int M, int D) {
@@ -172,49 +176,63 @@ char getPhase(int Y, int M, int D) {
   YY = Y - floor((12 - M) / 10);
   MM = M + 9;
   if (MM >= 12) MM = MM - 12;
+
   K1 = floor(365.25 * (YY + 4712));
   K2 = floor(30.6 * MM + 0.5);
   K3 = floor(floor((YY / 100) + 49) * 0.75) - 38;
+
   JD = K1 + K2 + D + 59;
-  if (JD > 2299160) JD = JD - K3;
+  if (JD > 2299160)
+    JD = JD - K3;
+
   IP = normalize((JD - 2451550.1) / 29.530588853);
   AG = IP * 29.53;
-  if (AG < 1.84566)  {
+  if (AG < 1.84566)
+  {
     lcd.createChar(1, moon[4]);
     lcd.createChar(2, moon[5]);
   }
-  else if (AG < 5.53699)  {
+  else if (AG < 5.53699)
+  {
     lcd.createChar(1, moon[4]);
     lcd.createChar(2, moon[7]);
   }
-  else if (AG < 9.22831)  {
+  else if (AG < 9.22831)
+  {
     lcd.createChar(1, moon[4]);
     lcd.createChar(2, moon[1]);
   }
-  else if (AG < 12.91963)  {
+  else if (AG < 12.91963)
+  {
     lcd.createChar(1, moon[2]);
     lcd.createChar(2, moon[1]);
   }
-  else if (AG < 16.61096)  {
+  else if (AG < 16.61096)
+  {
     lcd.createChar(1, moon[0]);
     lcd.createChar(2, moon[1]);
   }
-  else if (AG < 20.30228)  {
+  else if (AG < 20.30228)
+  {
     lcd.createChar(1, moon[0]);
     lcd.createChar(2, moon[3]);
   }
-  else if (AG < 23.99361)  {
+  else if (AG < 23.99361)
+  {
     lcd.createChar(1, moon[0]);
     lcd.createChar(2, moon[5]);
   }
-  else if (AG < 27.68493)  {
+  else if (AG < 27.68493)
+  {
     lcd.createChar(1, moon[6]);
     lcd.createChar(2, moon[5]);
   }
-  else  {
+  else
+  {
     lcd.createChar(1, moon[4]);
     lcd.createChar(2, moon[5]);
   }
+
   phase = AG;
   return phase;
 }
@@ -302,6 +320,17 @@ void write_RTC() {
     case 'u' :
     case 'U' :
       use();
+      break;
+    case 'r' :
+      //      RTC.stop();
+      Serial.println("Clock stopped");
+      break;
+    case 'R' :
+      //      RTC.start();
+      Serial.println("Clock running");
+      lcd.init();                      // initialize the lcd
+      lcd.backlight();
+      lcd.clear();
       break;
     case 'b' :
       if (  bl == 1)
@@ -453,3 +482,4 @@ unsigned long sendNTPpacket(IPAddress& address)
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
 }
+
