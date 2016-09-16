@@ -12,32 +12,37 @@
 
 
 */
-// This is for compatibility with both arduino 1.0 and previous versions
-//#include <Arduino.h>
+//extern "C" {
+//#include "ttbasic.h"
+//}
+
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #define printByte(args)  write(args);
 #include "RTClib.h"
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+WiFiUDP udp;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+RTC_DS1307 rtc;
+
+extern "C" {
+#include "ttbasic.h"
+}
 
 //char ssid[] = "mao";  //  your network SSID (name)
 //char pass[] = "maomaomao";       // your network password
 
-char ssid[] = "yuterra.main"; //  your network SSID (name)
-char pass[] = "apwh46fds"; // your network password
+//char ssid[] = { 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00 };
+//char pass[] = { 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00 };
 
 unsigned int localPort = 2390; // local port to listen for UDP packets
 IPAddress timeServerIP;
 //const char* ntpServerName = "time.nist.gov";
-const char* ntpServerName = "ntp.yuterra.ru";
+// char* ntpServerName = "ntp.yuterra.ru";
 int TZ = 3;
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[ NTP_PACKET_SIZE];
-WiFiUDP udp;
-
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 int eval1 = 0;
@@ -144,7 +149,14 @@ byte moon[8][8] = {
   }
 };
 
+boolean isWiFi=true;
+
+String strssid="yuterra.main"; //  your network SSID (name)
+String strpass="apwh46fds"; // your network password
+String strntpServerName = "ntp.yuterra.ru";
+
 void setup() {
+
   ESP.wdtDisable();
   ESP.wdtEnable(150000);
   Wire.begin(0, 2);
@@ -158,12 +170,13 @@ void setup() {
   Serial.begin(9600);
   if (!rtc.begin()) {
     Serial.println("ERROR: Couldn't find RTC");
-    lcd.setCursor(0, 0); // устанавливаем позицию курсора на экране (на один символ правее левого верхнего угла)
+    lcd.setCursor(0, 0); 
     lcd.print("Couldn't find RTC");
     //        while (1);
   }
+
   lcd.clear();
-  WiFi.begin(ssid, pass);
+  WiFi.begin( strssid.c_str(), strpass.c_str());
   lcd.setCursor(13, 1);
   int i = 0;
   while (WiFi.status() != WL_CONNECTED) {
@@ -173,10 +186,11 @@ void setup() {
       yield();
       lcd.print("_");
       Serial.println("No WiFi found!!!");
+      isWiFi=false;
       break;
     }
   }
-  if (i < 20) {
+  if (isWiFi) {
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
     Serial.println("Starting UDP");
@@ -186,13 +200,33 @@ void setup() {
     getNtpTime();
     lcd.printByte(0);
   }
-  Serial.println("------------");
-  Serial.println(WiFi.status());
-  Serial.println("------------");
+//  Serial.println("------------");
+//  Serial.println(WiFi.status());
+//  Serial.println("------------");
   
   use();
 }
 
+/*void savenvram(char* ssid,char* pass,  char* ntpServerName){
+uint8_t ssidData[20]={ 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00 };
+for (int i=0;i<sizeof(ssid);i++)ssidData[i]=ssid[i]  ;
+uint8_t passData[15]={ 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00 };
+for (int i=0;i<sizeof(pass);i++)passData[i]=pass[i]  ;
+ uint8_t ntpServerNameData[20]={ 0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00 };
+for (int i=0;i<sizeof(ntpServerName);i++)ntpServerNameData[i]=ntpServerName[i]  ;
+
+
+  rtc.writenvram(0,0x01);
+  rtc.writenvram(1, ssidData,20);
+  rtc.writenvram(21,passData,15);
+  rtc.writenvram(36,(uint8_t) ntpServerNameData,20);
+  }
+void loadnvram(){
+  rtc.readnvram( ssidData,20,1);
+  rtc.readnvram( passData,15,1);
+  rtc.readnvram((uint8_t) ntpServerName,20,1);
+  }
+*/
 
 void loop() {
   ESP.wdtDisable();
@@ -325,6 +359,7 @@ String addZero(int val) {
 void ajustRTC() {
   char value = 0;
   char command = 0;
+  DataRead();
   command = Serial.read();
   delay(50); //delay to allow good serial port reading
   value = byte((Serial.read() - 48) * 10); //-48 becaus ASCII value for 0 is 48, 1 is 49, etc and *10 because we read tens first
@@ -365,17 +400,6 @@ void ajustRTC() {
     case 'U':
       use();
       break;
-    case 'r':
-      //      RTC.stop();
-      Serial.println("Clock stopped");
-      break;
-    case 'R':
-      //      RTC.start();
-      Serial.println("Clock running");
-      lcd.init(); // initialize the lcd
-      lcd.backlight();
-      lcd.clear();
-      break;
     case 'b':
       if (backLight == 1) {
         lcd.noBacklight();
@@ -384,6 +408,12 @@ void ajustRTC() {
         lcd.backlight();
         backLight = 1;
       }
+      break;
+    case 'p':
+    case 'P':
+      basic();
+      lcd.clear();
+      lcd.setCursor(0,0);
       break;
 
     default:
@@ -434,7 +464,9 @@ void DataDisplay() {
 
 void getNtpTime() {
   //get a random server from the pool
-  WiFi.hostByName(ntpServerName, timeServerIP);
+//  WiFi.hostByName(ntpServerName, timeServerIP);
+
+WiFi.hostByName(strntpServerName.c_str(), timeServerIP);
 
   sendNTPpacket(timeServerIP); // send an NTP packet to a time server
   // wait to see if a reply is available
