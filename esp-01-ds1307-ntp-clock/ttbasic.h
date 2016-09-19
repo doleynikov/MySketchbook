@@ -2,7 +2,7 @@
         TOYOSHIKI TinyBASIC V1.0
         Reference source
         (C)2012 Tetsuya Suzuki, All rights reserved.
- */
+*/
 
 // Compiler requires description
 
@@ -14,21 +14,28 @@
 
 //extern LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-void c_putch(char c){
+
+#define ROWS 2
+#define COLS 16
+
+
+void c_putch(char c) {
   Serial.write(c);
-  lcd.print(c);
+  //  lcd.print(c);
+  lcdOut(c);
+
 }
-char c_getch(){
+char c_getch() {
   return Serial.read();
 }
-char c_kbhit(){
+char c_kbhit() {
   return Serial.available();
 }
-void newline(void){
+void newline(void) {
   c_putch(13); //CR
   c_putch(10); //LF
 }
-boolean   basic_stop=false;
+boolean   basic_stop = false;
 
 // TOYOSHIKI TinyBASIC symbols
 // TO-DO Rewrite defined values to fit your machine as needed
@@ -60,7 +67,7 @@ const char* kwtbl[] = {
   "GOTO", "GOSUB", "RETURN",
   "FOR", "TO", "STEP", "NEXT",
   "IF", "REM", "STOP",
-  "INPUT", "PRINT", "LET","END",
+  "INPUT", "PRINT", "LET", "END",
   ",", ";",
   "-", "+", "*", "/", "(", ")",
   ">=", "#", ">", "=", "<=", "<",
@@ -72,11 +79,11 @@ const char* kwtbl[] = {
 #define SIZE_KWTBL (sizeof(kwtbl) / sizeof(const char*))
 
 // i-code(Intermediate code) assignment
-enum{
+enum {
   I_GOTO, I_GOSUB, I_RETURN,
   I_FOR, I_TO, I_STEP, I_NEXT,
   I_IF, I_REM, I_STOP,
-  I_INPUT, I_PRINT, I_LET,I_END,
+  I_INPUT, I_PRINT, I_LET, I_END,
   I_COMMA, I_SEMI,
   I_MINUS, I_PLUS, I_MUL, I_DIV, I_OPEN, I_CLOSE,
   I_GTE, I_SHARP, I_GT, I_EQ, I_LTE, I_LT,
@@ -93,7 +100,7 @@ enum{
 
 // Error messages
 unsigned char err;// Error message index
-const char* errmsg[] ={
+const char* errmsg[] = {
   "OK",
   "Devision by zero",
   "Overflow",
@@ -120,7 +127,7 @@ const char* errmsg[] ={
 };
 
 // Error code assignment
-enum{
+enum {
   ERR_OK,
   ERR_DIVBY0,
   ERR_VOF,
@@ -148,71 +155,70 @@ enum{
 
 // Standard C libraly (about same) functions
 char c_toupper(char c) {
-  return(c <= 'z' && c >= 'a' ? c - 32 : c);
+  return (c <= 'z' && c >= 'a' ? c - 32 : c);
 }
 char c_isprint(char c) {
-  return(c >= 32  && c <= 126);
+  return (c >= 32  && c <= 126);
 }
 char c_isspace(char c) {
-  return(c <= ' ' &&(c == ' ' || (c <= 13 && c >= 9)));
+  return (c <= ' ' && (c == ' ' || (c <= 13 && c >= 9)));
 }
 char c_isdigit(char c) {
-  return(c <= '9' && c >= '0');
+  return (c <= '9' && c >= '0');
 }
 char c_isalpha(char c) {
   return ((c <= 'z' && c >= 'a') || (c <= 'Z' && c >= 'A'));
 }
-char* c_strchr(char *s, char c){
-  while(*s) {
-    if(*s == c) return (s);
+char* c_strchr(char *s, char c) {
+  while (*s) {
+    if (*s == c) return (s);
     ++s;
   }
   return NULL;
 }
 void c_puts(const char *s) {
-  while(*s) c_putch(*s++);
+  while (*s) c_putch(*s++);
 }
-void c_gets(){
+void c_gets() {
   char c;
   unsigned char len;
 
   len = 0;
-  while((c = c_getch()) != 13){
-  yield();
+  while ((c = c_getch()) != 13) {
+    yield();
 
-    if( c == 9) c = ' '; // TAB exchange Space
-    if((c == 8) && (len > 0)){ // Backspace manipulation
+    if ( c == 9) c = ' '; // TAB exchange Space
+    if ((c == 8) && (len > 0)) { // Backspace manipulation
       len--;
-      c_putch(8); 
-      c_putch(' '); 
       c_putch(8);
-    } 
-    else
-      if(c_isprint(c) && (len < (SIZE_LINE - 1))){
-        lbuf[len++] = c;
-        c_putch(c);
-      }
+      c_putch(' ');
+      c_putch(8);
+    }
+    else if (c_isprint(c) && (len < (SIZE_LINE - 1))) {
+      lbuf[len++] = c;
+      c_putch(c);
+    }
   }
   newline();
   lbuf[len] = 0; // Put NULL
 
-  if(len > 0){
-    while(c_isspace(lbuf[--len])); // Skip space
+  if (len > 0) {
+    while (c_isspace(lbuf[--len])); // Skip space
     lbuf[++len] = 0; // Put NULL
   }
 }
 
 // GOSUB-RETURN stack
-void gpush(unsigned char* pd){
-  if(gstki < SIZE_GSTK){
+void gpush(unsigned char* pd) {
+  if (gstki < SIZE_GSTK) {
     gstk[gstki++] = pd;
     return;
   }
   err = ERR_GSTKOF;
 }
 
-unsigned char* gpop(){
-  if(gstki > 0){
+unsigned char* gpop() {
+  if (gstki > 0) {
     return gstk[--gstki];
   }
   err = ERR_GSTKUF;
@@ -220,16 +226,16 @@ unsigned char* gpop(){
 }
 
 // FOR-NEXT stack
-void lpush(unsigned char* pd){
-  if(lstki < SIZE_LSTK){
+void lpush(unsigned char* pd) {
+  if (lstki < SIZE_LSTK) {
     lstk[lstki++] = pd;
     return;
   }
   err = ERR_LSTKOF;
 }
 
-unsigned char* lpop(){
-  if(lstki > 0){
+unsigned char* lpop() {
+  if (lstki > 0) {
     return lstk[--lstki];
   }
   err = ERR_LSTKUF;
@@ -246,14 +252,14 @@ void error()
 }
 
 // Print numeric specified columns
-void putnum(short value, short d){
+void putnum(short value, short d) {
   unsigned char i;
   unsigned char sign;
 
-  if(value < 0){
+  if (value < 0) {
     sign = 1;
     value = -value;
-  } 
+  }
   else {
     sign = 0;
   }
@@ -263,14 +269,14 @@ void putnum(short value, short d){
   do {
     lbuf[--i] = (value % 10) + '0';
     value /= 10;
-  } 
-  while(value > 0);
+  }
+  while (value > 0);
 
-  if(sign)
+  if (sign)
     lbuf[--i] = '-';
 
   //String length = 6 - i
-  while(6 - i < d){ // If short
+  while (6 - i < d) { // If short
     c_putch(' '); // Fill space
     d--;
   }
@@ -279,80 +285,79 @@ void putnum(short value, short d){
 
 // Input numeric and return value
 // Called by only INPUT statement
-short getnum(){
+short getnum() {
   short value, tmp;
   char c;
   unsigned char len;
   unsigned char sign;
 
   len = 0;
-  while((c = c_getch()) != 13){
-    if((c == 8) && (len > 0)){ // Backspace manipulation
+  while ((c = c_getch()) != 13) {
+    if ((c == 8) && (len > 0)) { // Backspace manipulation
       len--;
-      c_putch(8); 
-      c_putch(' '); 
       c_putch(8);
-    } 
-    else
-      if(       (len == 0 && (c == '+' || c == '-')) ||
-        (len < 6 && c_isdigit(c))){ // Numeric or sign only
-        lbuf[len++] = c;
-        c_putch(c);
-      }
+      c_putch(' ');
+      c_putch(8);
+    }
+    else if (       (len == 0 && (c == '+' || c == '-')) ||
+                    (len < 6 && c_isdigit(c))) { // Numeric or sign only
+      lbuf[len++] = c;
+      c_putch(c);
+    }
   }
   newline();
   lbuf[len] = 0;
 
-  switch(lbuf[0]){
-  case '-':
-    sign = 1;
-    len = 1;
-    break;
-  case '+':
-    sign = 0;
-    len = 1;
-    break;
-  default:
-    sign = 0;
-    len = 0;
-    break;
+  switch (lbuf[0]) {
+    case '-':
+      sign = 1;
+      len = 1;
+      break;
+    case '+':
+      sign = 0;
+      len = 1;
+      break;
+    default:
+      sign = 0;
+      len = 0;
+      break;
   }
 
   value = 0; // Initialize value
   tmp = 0; // Temp value
-  while(lbuf[len]){
+  while (lbuf[len]) {
     tmp = 10 * value + lbuf[len++] - '0';
-    if(value > tmp){ // It means overflow
+    if (value > tmp) { // It means overflow
       err = ERR_VOF;
     }
     value = tmp;
   }
-  if(sign)
+  if (sign)
     return -value;
   return value;
 }
 
 // Byte X,L,H -> Short HL
 // Used to get line number or I_NUM value
-short getvalue(unsigned char* ip){
-  if(*ip == 0)
+short getvalue(unsigned char* ip) {
+  if (*ip == 0)
     return 32767; // Case X = 0
-  return((short)*(ip + 1) + ((short)*(ip + 2) << 8));
+  return ((short) * (ip + 1) + ((short) * (ip + 2) << 8));
 }
 
 // Get argument in parenthesis
-short getparam(){
+short getparam() {
   short value;
 
-  if(*cip != I_OPEN){
+  if (*cip != I_OPEN) {
     err = ERR_PAREN;
     return 0;
   }
   cip++;
   value = iexp();
-  if(err) return 0;
+  if (err) return 0;
 
-  if(*cip != I_CLOSE){
+  if (*cip != I_CLOSE) {
     err = ERR_PAREN;
     return 0;
   }
@@ -362,12 +367,12 @@ short getparam(){
 }
 
 // Search line by line number
-unsigned char* getlp(short lineno){
+unsigned char* getlp(short lineno) {
   unsigned char *lp;
 
   lp = listbuf;
-  while(*lp){
-    if(getvalue(lp) >= lineno)
+  while (*lp) {
+    if (getvalue(lp) >= lineno)
       break;
     lp += *lp;
   }
@@ -376,7 +381,7 @@ unsigned char* getlp(short lineno){
 
 // Convert token to i-code
 // Return byte length or 0
-unsigned char toktoi(){
+unsigned char toktoi() {
   unsigned char i; // Loop counter(i-code sometime)
   unsigned char len; //byte counter
   short value;
@@ -388,21 +393,21 @@ unsigned char toktoi(){
 
   s = lbuf;
   len = 0; // Clear byte length
-  while(*s){
-    while(c_isspace(*s)) s++; // Skip space
+  while (*s) {
+    while (c_isspace(*s)) s++; // Skip space
 
     //Try keyword conversion
-    for(i = 0; i < SIZE_KWTBL; i++){
+    for (i = 0; i < SIZE_KWTBL; i++) {
       pkw = (char *)kwtbl[i]; // Point keyword
       ptok = s; // Point top of command line
       // Compare
-      while((*pkw != 0) && (*pkw == c_toupper(*ptok))){
+      while ((*pkw != 0) && (*pkw == c_toupper(*ptok))) {
         pkw++;
         ptok++;
       }
-      if(*pkw == 0){// Case success
+      if (*pkw == 0) { // Case success
         // i have i-code
-        if(len >= SIZE_IBUF - 1){// List area full
+        if (len >= SIZE_IBUF - 1) { // List area full
           err = ERR_IBUFOF;
           return 0;
         }
@@ -413,42 +418,42 @@ unsigned char toktoi(){
     }
 
     // Case statement needs an argument except numeric, valiable, or strings
-    switch(i){
-    case I_REM:
-      while(c_isspace(*s)) s++; // Skip space
-      ptok = s;
-      for(i = 0; *ptok++; i++); // Get length
-      if(len >= SIZE_IBUF - 2 - i){
-        err = ERR_IBUFOF;
-        return 0;
-      }
-      ibuf[len++] = i; // Put length
-      while(i--){ // Copy strings
-        ibuf[len++] = *s++;
-      }
-      return len;
-    default:
-      break;
+    switch (i) {
+      case I_REM:
+        while (c_isspace(*s)) s++; // Skip space
+        ptok = s;
+        for (i = 0; *ptok++; i++); // Get length
+        if (len >= SIZE_IBUF - 2 - i) {
+          err = ERR_IBUFOF;
+          return 0;
+        }
+        ibuf[len++] = i; // Put length
+        while (i--) { // Copy strings
+          ibuf[len++] = *s++;
+        }
+        return len;
+      default:
+        break;
     }
 
-    if(*pkw != 0){ // Case not keyword
+    if (*pkw != 0) { // Case not keyword
       ptok = s; // Point top of command line
 
       // Try numeric conversion
-      if(c_isdigit(*ptok)){
+      if (c_isdigit(*ptok)) {
         value = 0;
         tmp = 0;
-        do{
+        do {
           tmp = 10 * value + *ptok++ - '0';
-          if(value > tmp){
+          if (value > tmp) {
             err = ERR_VOF;
             return 0;
           }
           value = tmp;
-        } 
-        while(c_isdigit(*ptok));
+        }
+        while (c_isdigit(*ptok));
 
-        if(len >= SIZE_IBUF - 3){
+        if (len >= SIZE_IBUF - 3) {
           err = ERR_IBUFOF;
           return 0;
         }
@@ -456,45 +461,45 @@ unsigned char toktoi(){
         ibuf[len++] = I_NUM;
         ibuf[len++] = value & 255;
         ibuf[len++] = value >> 8;
-      } 
+      }
       else
 
-          // Try valiable conversion
-        if(c_isalpha(*ptok)){
-          if(len >= SIZE_IBUF - 2){
+        // Try valiable conversion
+        if (c_isalpha(*ptok)) {
+          if (len >= SIZE_IBUF - 2) {
             err = ERR_IBUFOF;
             return 0;
           }
-          if(len >= 2 && ibuf[len -2] == I_VAR){ // Case series of variables
+          if (len >= 2 && ibuf[len - 2] == I_VAR) { // Case series of variables
             err = ERR_SYNTAX; // Syntax error
             return 0;
           }
           ibuf[len++] = I_VAR; // Put i-code
           ibuf[len++] = c_toupper(*ptok) - 'A'; // Put index of valiable area
           s++;
-        } 
+        }
         else
 
-            // Try string conversion
-          if(*s == '\"' || *s == '\''){// If start of string
+          // Try string conversion
+          if (*s == '\"' || *s == '\'') { // If start of string
             c = *s;
             s++; // Skip " or '
             ptok = s;
-            for(i = 0; (*ptok != c) && c_isprint(*ptok); i++) // Get length
+            for (i = 0; (*ptok != c) && c_isprint(*ptok); i++) // Get length
               ptok++;
-            if(len >= SIZE_IBUF - 1 - i){ // List area full
+            if (len >= SIZE_IBUF - 1 - i) { // List area full
               err = ERR_IBUFOF;
               return 0;
             }
             ibuf[len++] = I_STR; // Put i-code
             ibuf[len++] = i; // Put length
-            while(i--){ // Put string
+            while (i--) { // Put string
               ibuf[len++] = *s++;
             }
-            if(*s == c) s++; // Skip " or '
+            if (*s == c) s++; // Skip " or '
 
             // Nothing mutch
-          } 
+          }
           else {
             err = ERR_SYNTAX;
             return 0;
@@ -506,63 +511,63 @@ unsigned char toktoi(){
 }
 
 //Listing 1 line of i-code
-void putlist(unsigned char* ip){
+void putlist(unsigned char* ip) {
   unsigned char i;
   short value;
 
-  while(*ip != I_EOL){
+  while (*ip != I_EOL) {
     // Case keyword
-    if(*ip < SIZE_KWTBL){
+    if (*ip < SIZE_KWTBL) {
       c_puts(kwtbl[*ip]);
-      if(IS_TOKSP(*ip) || *ip == I_SEMI)c_putch(' ');
-      if(*ip == I_REM){
+      if (IS_TOKSP(*ip) || *ip == I_SEMI)c_putch(' ');
+      if (*ip == I_REM) {
         ip++;
         i = *ip++;
-        while(i--){
+        while (i--) {
           c_putch(*ip++);
         }
         return;
       }
       ip++;
-    } 
+    }
     else
 
-        // Case numeric
-      if(*ip == I_NUM){
+      // Case numeric
+      if (*ip == I_NUM) {
         putnum(getvalue(ip), 0);
         ip += 3;
-        if(!IS_OP(*ip) && !IS_SEP(*ip)) c_putch(' ');
-      } 
+        if (!IS_OP(*ip) && !IS_SEP(*ip)) c_putch(' ');
+      }
       else
 
-          // Case valiable
-        if(*ip == I_VAR){
+        // Case valiable
+        if (*ip == I_VAR) {
           ip++;
           c_putch(*ip++ + 'A');
-          if(!IS_OP(*ip) && !IS_SEP(*ip)) c_putch(' ');
-        } 
+          if (!IS_OP(*ip) && !IS_SEP(*ip)) c_putch(' ');
+        }
         else
 
-            // Case string
-          if(*ip == I_STR){
+          // Case string
+          if (*ip == I_STR) {
             ip++;
             value = 0;
             i = *ip;
-            while(i--){
-              if(*(ip + i + 1) == '\"')
+            while (i--) {
+              if (*(ip + i + 1) == '\"')
                 value = 1;
             }
-            if(value) c_putch('\''); 
+            if (value) c_putch('\'');
             else c_putch('\"');
             i = *ip++;
-            while(i--){
+            while (i--) {
               c_putch(*ip++);
             }
-            if(value) c_putch('\''); 
+            if (value) c_putch('\'');
             else c_putch('\"');
 
             // Nothing match, I think, such case is impossible
-          } 
+          }
           else {
             err = ERR_SYS;
             return;
@@ -571,7 +576,7 @@ void putlist(unsigned char* ip){
 }
 
 // Insert i-code to the list
-void inslist(){
+void inslist() {
   unsigned char len;
   unsigned char *lp1, *lp2;
 
@@ -579,7 +584,7 @@ void inslist(){
   clp = getlp(getvalue(cip));
 
   lp1 = clp;
-  if(getvalue(lp1) == getvalue(cip)){
+  if (getvalue(lp1) == getvalue(cip)) {
     // Temporary measures of the case that
     // same line numbere exists and list area full,
     // existing line is deleted and new line is not inserted in.
@@ -590,8 +595,8 @@ void inslist(){
     // }
 
     lp2 = lp1 + *lp1;
-    while((len = *lp2) != 0){
-      while(len--){
+    while ((len = *lp2) != 0) {
+      while (len--) {
         *lp1++ = *lp2++;
       }
     }
@@ -599,14 +604,14 @@ void inslist(){
   }
 
   // Case line number only
-  if(*cip == 4)
+  if (*cip == 4)
     return;
 
   // Check insertable
-  while(*lp1){
+  while (*lp1) {
     lp1 += *lp1;
   }
-  if(*cip > (listbuf + SIZE_LIST - lp1 - 1)){
+  if (*cip > (listbuf + SIZE_LIST - lp1 - 1)) {
     err = ERR_LBUFOF;
     return;
   }
@@ -614,24 +619,24 @@ void inslist(){
   // Make space
   len = lp1 - clp + 1;
   lp2 = lp1 + *cip;
-  while(len--){
+  while (len--) {
     *lp2-- = *lp1--;
   }
 
   // Insert
   len = *cip;
-  while(len--){
+  while (len--) {
     *clp++ = *cip++;
   }
 }
 
 // Return free memory
-short getsize(){
+short getsize() {
   short value;
   unsigned char* lp;
 
   lp = listbuf;
-  while(*lp){
+  while (*lp) {
     lp += *lp;
   }
 
@@ -640,24 +645,24 @@ short getsize(){
 }
 
 // Return Absolute value
-short getabs(){
+short getabs() {
   short value;
 
   value = getparam();
-  if(err) return 0;
+  if (err) return 0;
 
-  if(value < 0) value *= -1;
+  if (value < 0) value *= -1;
   return value;
 }
 
 // Return random number
 // TO-DO Rewrite this function to fit your machine
 // And see 'irun()'
-short getrnd(void){
+short getrnd(void) {
   short value;
 
   value = getparam();
-  if(err) return 0;
+  if (err) return 0;
 
   return (random(value)) + 1;
 }
@@ -667,69 +672,69 @@ short getarray()
   short index;
 
   index = getparam();
-  if(err) return 0;
+  if (err) return 0;
 
-  if(index < SIZE_ARRY){
+  if (index < SIZE_ARRY) {
     return arr[index];
-  } 
+  }
   else {
     err = ERR_SOL;
     return 0;
   }
 }
 
-short ivalue(){
+short ivalue() {
   short value;
 
-  switch(*cip){
-  case I_PLUS:
-    cip++;
-    value = ivalue();
-    break;
-  case I_MINUS:
-    cip++;
-    value = 0 - ivalue();
-    break;
-  case I_VAR:
-    cip++;
-    value = var[*cip++];
-    break;
-  case I_NUM:
-    value = getvalue(cip);
-    cip += 3;
-    break;
-  case I_ARRAY:
-    cip++;
-    value = getarray();
-    break;
-  case I_OPEN:
-    value = getparam();
-    break;
-  case I_RND:
-    cip++;
-    value = getrnd();
-    break;
-  case I_ABS:
-    cip++;
-    value = getabs();
-    break;
-  case I_SIZE:
-    cip++;
-    if(*cip == I_OPEN){
+  switch (*cip) {
+    case I_PLUS:
       cip++;
-      if(*cip == I_CLOSE)
+      value = ivalue();
+      break;
+    case I_MINUS:
+      cip++;
+      value = 0 - ivalue();
+      break;
+    case I_VAR:
+      cip++;
+      value = var[*cip++];
+      break;
+    case I_NUM:
+      value = getvalue(cip);
+      cip += 3;
+      break;
+    case I_ARRAY:
+      cip++;
+      value = getarray();
+      break;
+    case I_OPEN:
+      value = getparam();
+      break;
+    case I_RND:
+      cip++;
+      value = getrnd();
+      break;
+    case I_ABS:
+      cip++;
+      value = getabs();
+      break;
+    case I_SIZE:
+      cip++;
+      if (*cip == I_OPEN) {
         cip++;
-      else{
-        err = ERR_PAREN;
+        if (*cip == I_CLOSE)
+          cip++;
+        else {
+          err = ERR_PAREN;
+        }
       }
-    }
-    value = getsize();
-    break;
+      value = getsize();
+      break;
 
-  default:
-    value = 0;
-    err = ERR_SYNTAX;
-    break;
+    default:
+      value = 0;
+      err = ERR_SYNTAX;
+      break;
   }
   return value;
 }
@@ -740,25 +745,24 @@ short icalc()
 
   value1 = ivalue();
 
-  while(1){
-    if(*cip == I_DIV){
+  while (1) {
+    if (*cip == I_DIV) {
       cip++;
       value2 = ivalue();
-      if(value2 == 0){
+      if (value2 == 0) {
         err = ERR_DIVBY0;
         break;
       }
       value1 /= value2;
-    } 
-    else
-      if(*cip == I_MUL){
-        cip++;
-        value2 = ivalue();
-        value1 *= value2;
-      } 
-      else {
-        break;
-      }
+    }
+    else if (*cip == I_MUL) {
+      cip++;
+      value2 = ivalue();
+      value1 *= value2;
+    }
+    else {
+      break;
+    }
   }
   return value1;
 }
@@ -769,404 +773,203 @@ short iexp()
 
   value1 = icalc();
 
-  while(*cip == I_PLUS || *cip == I_MINUS){
+  while (*cip == I_PLUS || *cip == I_MINUS) {
     value2 = icalc();
     value1 += value2;
   }
   return value1;
 }
 
-void iprint(){
+void iprint() {
   short value;
   short len;
   unsigned char i;
 
   len = 0;
-  while(1){
-    switch(*cip){
-    case I_SEMI:
-    case I_EOL:
-      break;
-    case I_STR:
-      cip++;
-      i = *cip++;
-      while(i--){
-        c_putch(*cip++);
-      }
-      break;
-    case I_SHARP:
-      cip++;
-      len = iexp();
-      if(err) return;
-      break;
-    default:
-      value = iexp();
-      if(err) return;
-      putnum(value, len);
-      break;
+  while (1) {
+    switch (*cip) {
+      case I_SEMI:
+      case I_EOL:
+        break;
+      case I_STR:
+        cip++;
+        i = *cip++;
+        while (i--) {
+          c_putch(*cip++);
+        }
+        break;
+      case I_SHARP:
+        cip++;
+        len = iexp();
+        if (err) return;
+        break;
+      default:
+        value = iexp();
+        if (err) return;
+        putnum(value, len);
+        break;
     }
 
-    if(*cip == I_COMMA){
+    if (*cip == I_COMMA) {
       cip++;
     }
-    else{
+    else {
       break;
     }
   };
   newline();
 }
 
-void iinput(){
+void iinput() {
   unsigned char i;
   short value;
   short index;
 
-  while(1){
-    switch(*cip){
-    case I_STR:
-      cip++;
-      i = *cip++;
-      while(i--){
-        c_putch(*cip++);
-      }
-      if(*cip == I_VAR){
+  while (1) {
+    switch (*cip) {
+      case I_STR:
         cip++;
-        value = getnum();
-        var[*cip++] = value;
-      } 
-      else
-        if(*cip == I_ARRAY){
+        i = *cip++;
+        while (i--) {
+          c_putch(*cip++);
+        }
+        if (*cip == I_VAR) {
+          cip++;
+          value = getnum();
+          var[*cip++] = value;
+        }
+        else if (*cip == I_ARRAY) {
           cip++;
           index = getparam();
-          if(err) return;
-          if(index >= SIZE_ARRY){
+          if (err) return;
+          if (index >= SIZE_ARRY) {
             err = ERR_SOL;
             return;
           }
           value = getnum();
           arr[index] = value;
         }
-      break;
-    case I_VAR:
-      cip++;
-      c_putch(*cip + 'A');
-      c_putch(':');
-      value = getnum();
-      var[*cip++] = value;
-      break;
-    case I_ARRAY:
-      cip++;
-      index = getparam();
-      if(err)
-        return;
-      if(index >= SIZE_ARRY){
-        err = ERR_SOL;
-        return;
-      }
-      c_putch('@');
-      c_putch('(');
-      putnum(index,0);
-      c_putch(')');
-      c_putch(':');
-      value = getnum();
-      arr[index] = value;
-      break;
+        break;
+      case I_VAR:
+        cip++;
+        c_putch(*cip + 'A');
+        c_putch(':');
+        value = getnum();
+        var[*cip++] = value;
+        break;
+      case I_ARRAY:
+        cip++;
+        index = getparam();
+        if (err)
+          return;
+        if (index >= SIZE_ARRY) {
+          err = ERR_SOL;
+          return;
+        }
+        c_putch('@');
+        c_putch('(');
+        putnum(index, 0);
+        c_putch(')');
+        c_putch(':');
+        value = getnum();
+        arr[index] = value;
+        break;
     }
 
-    switch(*cip){
-    case I_COMMA:
-      cip++;
-      break;
-    case I_SEMI:
-    case I_EOL:
-      return;
-    default:
-      err = ERR_SYNTAX;
-      return;
+    switch (*cip) {
+      case I_COMMA:
+        cip++;
+        break;
+      case I_SEMI:
+      case I_EOL:
+        return;
+      default:
+        err = ERR_SYNTAX;
+        return;
     }
   }
 }
 
-char iif(){
+char iif() {
   short value1, value2;
   unsigned char i;
 
   value1 = iexp();
-  if(err) return -1;
+  if (err) return -1;
 
   i = *cip++;
 
   value2 = iexp();
-  if(err) return -1;
+  if (err) return -1;
 
-  switch(i){
-  case I_EQ:
-    return value1 == value2;
-  case I_SHARP:
-    return value1 != value2;
-  case I_LT:
-    return value1 <  value2;
-  case I_LTE:
-    return value1 <= value2;
-  case I_GT:
-    return value1 >  value2;
-  case I_GTE:
-    return value1 >= value2;
-  default:
-    err = ERR_IFWOC;
-    return -1;
+  switch (i) {
+    case I_EQ:
+      return value1 == value2;
+    case I_SHARP:
+      return value1 != value2;
+    case I_LT:
+      return value1 <  value2;
+    case I_LTE:
+      return value1 <= value2;
+    case I_GT:
+      return value1 >  value2;
+    case I_GTE:
+      return value1 >= value2;
+    default:
+      err = ERR_IFWOC;
+      return -1;
   }
 }
 
-void ivar(){
+void ivar() {
   short value;
   short index;
 
   index = *cip++;
-  if(*cip == I_EQ){
+  if (*cip == I_EQ) {
     cip++;
     value = iexp();
-    if(err) return;
-  } 
+    if (err) return;
+  }
   else {
     err = ERR_VWOEQ;
     return;
   }
 
-  if(index < 26){
+  if (index < 26) {
     var[index] = value;
-  } 
+  }
   else {
     err = ERR_SOL;
   }
 }
 
-void iarray(){
+void iarray() {
   short value;
   short index;
 
   index = getparam();
-  if(err) return;
-  if(*cip == I_EQ){
+  if (err) return;
+  if (*cip == I_EQ) {
     cip++;
     value = iexp();
-    if(err) return;
-  } 
+    if (err) return;
+  }
   else {
     err = ERR_VWOEQ;
     return;
   }
 
-  if(index < SIZE_ARRY){
+  if (index < SIZE_ARRY) {
     arr[index] = value;
-  } 
+  }
   else {
     err = ERR_SOL;
   }
 }
 
-void ilet(){
-  switch(*cip){
-  case I_VAR:
-    cip++;
-    ivar();
-    break;
-  case I_ARRAY:
-    cip++;
-    iarray();
-    break;
-  default:
-    err = ERR_LETWOV;
-    break;
-  }
-}
-
-void ilist(){
-  short lineno;
-
-  if(*cip == I_NUM){
-    lineno = getvalue(cip);
-    cip += 3;
-  } 
-  else {
-    lineno = 0;
-  }
-
-  for(  clp = listbuf;
-                        *clp && (getvalue(clp) < lineno);
-                        clp += *clp);
-
-  while(*clp){
-    putnum(getvalue(clp), 0);
-    c_putch(' ');
-    putlist(clp + 3);
-    if(err){
-      break;
-    }
-    newline();
-    clp += *clp;
-  }
-}
-
-void inew(void){
-  unsigned char i;
-  for(i = 0; i < 26; i++)
-    var[i] = 0;
-  gstki = 0;
-  lstki = 0;
-  *listbuf = 0;
-  clp = listbuf;
-}
-
-unsigned char* iexe(){
-  short lineno;
-  unsigned char cd;
-  unsigned char* lp;
-  short vto, vstep;
-  short index;
-
-  while(1){
-    if(c_kbhit()){
-      if(c_getch() == 27){
-        while(*clp){
-          clp += *clp;
-        }
-        err = ERR_ESC;
-        return clp;
-      }
-    }
-
-    switch(*cip){
-    case I_GOTO:
-      cip++;
-      lineno = iexp();
-      clp = getlp(lineno);
-      if(lineno != getvalue(clp)){
-        err = ERR_ULN;
-        return NULL;
-      }
-      cip = clp + 3;
-      continue;
-    case I_GOSUB:
-      cip++;
-      lineno = iexp();
-      if(err) return NULL;
-      lp = getlp(lineno);
-      if(lineno != getvalue(lp)){
-        err = ERR_ULN;
-        return NULL;
-      }
-      gpush(clp);
-      gpush(cip);
-      if(err) return NULL;
-      clp = lp;
-      cip = clp + 3;
-      continue;
-    case I_RETURN:
-      cip = gpop();
-      lp = gpop();
-      if(err) return NULL;
-      clp = lp;
-      break;
-    case I_FOR:
-      cip++;
-      if(*cip++ != I_VAR){
-        err = ERR_FORWOV;
-        return NULL;
-      }
-      index = *cip;
-      ivar();
-      if(err) return NULL;
-
-      if(*cip == I_TO){
-        cip++;
-        vto = iexp();
-      } 
-      else {
-        err = ERR_FORWOTO;
-        return NULL;
-      }
-      if(*cip == I_STEP){
-        cip++;
-        vstep = iexp();
-      } 
-      else {
-        vstep = 1;
-      }
-
-      lpush(clp);
-      lpush(cip);
-      lpush((unsigned char*)vto);
-      lpush((unsigned char*)vstep);
-      lpush((unsigned char*)index);
-      if(err) return NULL;
-      break;
-    case I_NEXT:
-      cip++;
-      if(*cip++ !=I_VAR){
-        err = ERR_NEXTWOV;
-        return NULL;
-      }
-
-      if(lstki < 5){
-        err = ERR_LSTKUF;
-        return NULL;
-      }
-      index = (uintptr_t)lstk[lstki - 1];
-      if(index != *cip){
-        err = ERR_NEXTUM;
-        return NULL;
-      }
-      cip++;
-      vstep = (uintptr_t)lstk[lstki - 2];
-      var[index] += vstep;
-
-      vto = (uintptr_t)lstk[lstki - 3];
-      if(       ((vstep < 0) && (var[index] < vto)) ||
-        ((vstep > 0) && (var[index] > vto))){
-        lstki -= 5;
-        break;
-      }
-      cip = lstk[lstki - 4];
-      clp = lstk[lstki - 5];
-      continue;
-
-    case I_IF:
-      cip++;
-      cd = iif();
-      if(err){
-        err = ERR_IFWOC;
-        return NULL;
-      }
-      if(cd)
-        continue;
-      // If false, same as REM
-    case I_REM:
-      // Seek pointer to I_EOL
-      // No problem even if it points not realy end of line
-      while(*cip != I_EOL) cip++;
-      break;
-    case I_STOP:
-      while(*clp){
-        clp += *clp;
-      }
-      return clp;
-    case I_END:
-      basic_stop=true;
-      return NULL;
-      break;
-    case I_INPUT:
-      cip++;
-      iinput();
-      break;
-    case I_PRINT:
-      cip++;
-      iprint();
-      break;
-    case I_LET:
-      cip++;
-      ilet();
-      break;
+void ilet() {
+  switch (*cip) {
     case I_VAR:
       cip++;
       ivar();
@@ -1175,29 +978,229 @@ unsigned char* iexe(){
       cip++;
       iarray();
       break;
-    case I_LIST:
-    case I_NEW:
-    case I_RUN:
-      err = ERR_COM;
-      return NULL;
+    default:
+      err = ERR_LETWOV;
+      break;
+  }
+}
+
+void ilist() {
+  short lineno;
+
+  if (*cip == I_NUM) {
+    lineno = getvalue(cip);
+    cip += 3;
+  }
+  else {
+    lineno = 0;
+  }
+
+  for (  clp = listbuf;
+         *clp && (getvalue(clp) < lineno);
+         clp += *clp);
+
+  while (*clp) {
+    putnum(getvalue(clp), 0);
+    c_putch(' ');
+    putlist(clp + 3);
+    if (err) {
+      break;
+    }
+    newline();
+    clp += *clp;
+  }
+}
+
+void inew(void) {
+  unsigned char i;
+  for (i = 0; i < 26; i++)
+    var[i] = 0;
+  gstki = 0;
+  lstki = 0;
+  *listbuf = 0;
+  clp = listbuf;
+}
+
+unsigned char* iexe() {
+  short lineno;
+  unsigned char cd;
+  unsigned char* lp;
+  short vto, vstep;
+  short index;
+
+  while (1) {
+    if (c_kbhit()) {
+      if (c_getch() == 27) {
+        while (*clp) {
+          clp += *clp;
+        }
+        err = ERR_ESC;
+        return clp;
+      }
     }
 
-    switch(*cip){
-    case I_SEMI:
-      cip++;
-      break;
-    case I_EOL:
-      return clp + *clp;
-    default:
-      err = ERR_SYNTAX;
-      return NULL;
+    switch (*cip) {
+      case I_GOTO:
+        cip++;
+        lineno = iexp();
+        clp = getlp(lineno);
+        if (lineno != getvalue(clp)) {
+          err = ERR_ULN;
+          return NULL;
+        }
+        cip = clp + 3;
+        continue;
+      case I_GOSUB:
+        cip++;
+        lineno = iexp();
+        if (err) return NULL;
+        lp = getlp(lineno);
+        if (lineno != getvalue(lp)) {
+          err = ERR_ULN;
+          return NULL;
+        }
+        gpush(clp);
+        gpush(cip);
+        if (err) return NULL;
+        clp = lp;
+        cip = clp + 3;
+        continue;
+      case I_RETURN:
+        cip = gpop();
+        lp = gpop();
+        if (err) return NULL;
+        clp = lp;
+        break;
+      case I_FOR:
+        cip++;
+        if (*cip++ != I_VAR) {
+          err = ERR_FORWOV;
+          return NULL;
+        }
+        index = *cip;
+        ivar();
+        if (err) return NULL;
+
+        if (*cip == I_TO) {
+          cip++;
+          vto = iexp();
+        }
+        else {
+          err = ERR_FORWOTO;
+          return NULL;
+        }
+        if (*cip == I_STEP) {
+          cip++;
+          vstep = iexp();
+        }
+        else {
+          vstep = 1;
+        }
+
+        lpush(clp);
+        lpush(cip);
+        lpush((unsigned char*)vto);
+        lpush((unsigned char*)vstep);
+        lpush((unsigned char*)index);
+        if (err) return NULL;
+        break;
+      case I_NEXT:
+        cip++;
+        if (*cip++ != I_VAR) {
+          err = ERR_NEXTWOV;
+          return NULL;
+        }
+
+        if (lstki < 5) {
+          err = ERR_LSTKUF;
+          return NULL;
+        }
+        index = (uintptr_t)lstk[lstki - 1];
+        if (index != *cip) {
+          err = ERR_NEXTUM;
+          return NULL;
+        }
+        cip++;
+        vstep = (uintptr_t)lstk[lstki - 2];
+        var[index] += vstep;
+
+        vto = (uintptr_t)lstk[lstki - 3];
+        if (       ((vstep < 0) && (var[index] < vto)) ||
+                   ((vstep > 0) && (var[index] > vto))) {
+          lstki -= 5;
+          break;
+        }
+        cip = lstk[lstki - 4];
+        clp = lstk[lstki - 5];
+        continue;
+
+      case I_IF:
+        cip++;
+        cd = iif();
+        if (err) {
+          err = ERR_IFWOC;
+          return NULL;
+        }
+        if (cd)
+          continue;
+      // If false, same as REM
+      case I_REM:
+        // Seek pointer to I_EOL
+        // No problem even if it points not realy end of line
+        while (*cip != I_EOL) cip++;
+        break;
+      case I_STOP:
+        while (*clp) {
+          clp += *clp;
+        }
+        return clp;
+      case I_END:
+        basic_stop = true;
+        return NULL;
+        break;
+      case I_INPUT:
+        cip++;
+        iinput();
+        break;
+      case I_PRINT:
+        cip++;
+        iprint();
+        break;
+      case I_LET:
+        cip++;
+        ilet();
+        break;
+      case I_VAR:
+        cip++;
+        ivar();
+        break;
+      case I_ARRAY:
+        cip++;
+        iarray();
+        break;
+      case I_LIST:
+      case I_NEW:
+      case I_RUN:
+        err = ERR_COM;
+        return NULL;
+    }
+
+    switch (*cip) {
+      case I_SEMI:
+        cip++;
+        break;
+      case I_EOL:
+        return clp + *clp;
+      default:
+        err = ERR_SYNTAX;
+        return NULL;
     }
   }
 }
 
 // Called by RUN command
 // TO-DO Rewrite initialize part of this function to fit your machine
-void irun(){
+void irun() {
   unsigned char* lp;
 
   gstki = 0;
@@ -1207,45 +1210,45 @@ void irun(){
   // Initialize
   randomSeed(micros());
 
-  while(*clp){
+  while (*clp) {
     cip = clp + 3;
     lp = iexe();
-    if(err)
+    if (err)
       return;
     clp = lp;
   }
 }
 
-void icom(){
+void icom() {
   cip = ibuf;
-  switch(*cip){
-  case I_LIST:
-    cip++;
-    if(*cip == I_EOL || *(cip + 3) == I_EOL)
-      ilist();
-    else
-      err = ERR_SYNTAX;
-    break;
-  case I_NEW:
-    cip++;
-    if(*cip == I_EOL)
-      inew();
-    else
-      err = ERR_SYNTAX;
-    break;
-  case I_RUN:
-    cip++;
-    irun();
-    break;
-  default:
-    iexe();
-    break;
+  switch (*cip) {
+    case I_LIST:
+      cip++;
+      if (*cip == I_EOL || *(cip + 3) == I_EOL)
+        ilist();
+      else
+        err = ERR_SYNTAX;
+      break;
+    case I_NEW:
+      cip++;
+      if (*cip == I_EOL)
+        inew();
+      else
+        err = ERR_SYNTAX;
+      break;
+    case I_RUN:
+      cip++;
+      irun();
+      break;
+    default:
+      iexe();
+      break;
   }
 
-  if(err && err != ERR_ESC){
-    if(cip >= listbuf && cip < listbuf + SIZE_LIST && *clp)
+  if (err && err != ERR_ESC) {
+    if (cip >= listbuf && cip < listbuf + SIZE_LIST && *clp)
     {
-      newline(); 
+      newline();
       c_puts("ERR LINE:");
       putnum(getvalue(clp), 0);
       c_putch(' ');
@@ -1253,7 +1256,7 @@ void icom(){
     }
     else
     {
-      newline(); 
+      newline();
       c_puts("YOU TYPE: ");
       putlist(ibuf);
     }
@@ -1261,46 +1264,75 @@ void icom(){
 
 }
 
-void basic(){
+int posX = 0;
+int posY = 1; //(начало самой нижней строки)
+String curLine = "";
+
+void basic() {
   ESP.wdtDisable();
   ESP.wdtEnable(150000);
-  basic_stop=false;
+  basic_stop = false;
   unsigned char len;
   lcd.clear();
-  lcd.setCursor(0,0);
+  lcd.setCursor(0, 0);
   inew();
-  c_puts("TOYOSHIKI TINY BASIC"); 
+  c_puts("TOYOSHIKI TINY BASIC");
   newline();
-  c_puts("ARDUINO EDITION"); 
+  c_puts("ARDUINO EDITION");
   newline();
   error(); // Print OK, and Clear error flag
 
   // Input 1 line and execute
-  while(1){
+  while (1) {
     yield();
     c_putch('>');// Prompt
     c_gets(); // Input 1 line
     len = toktoi(); // Convert token to i-code
-    if (basic_stop){return;}
-    if(err){ // Error
-      newline(); 
+    if (basic_stop) {
+      return;
+    }
+    if (err) { // Error
+      newline();
       c_puts("YOU TYPE:");
       c_puts(lbuf);
       error();
       continue; // Do nothing
     }
 
-    if(*ibuf == I_NUM){ // Case the top includes line number
+    if (*ibuf == I_NUM) { // Case the top includes line number
       *ibuf = len; // Change I_NUM to byte length
       inslist(); // Insert list
-      if(err){
+      if (err) {
         error(); // List buffer overflow
       }
-    } 
+    }
     else {
       icom(); // Execute direct
       error(); // Print OK, and Clear error flag
     }
   }
 }
+
+void lcdOut(char c) {
+  boolean newLine = false;
+  if (c == 13) {
+    c = "";
+    newLine = true;
+  }
+  if (c == 10) {
+    c = "";
+  }
+  if (posX <= COLS - 1 && !newLine) {
+    lcd.write(c);
+    curLine+=c;
+    posX++;
+    newLine=false;
+  }
+  else {
+    lcd.setCursor(0, 0);
+    lcd.print(curLine);
+    curLine="";
+  }
+}
+
 
