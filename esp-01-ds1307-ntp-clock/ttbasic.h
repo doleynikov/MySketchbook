@@ -11,20 +11,44 @@
 // And see 'getrnd()'
 
 //#include <LiquidCrystal_I2C.h>
-
 //extern LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+int screenMem[32];
+int cursorX = 0;
+int checkChar = 0;
 
-#define ROWS 2
-#define COLS 16
+static void doFrame(byte amount) {
+  lcd.clear();
+  lcd.noCursor();
+  for (int xg = 0 ; xg < amount ; xg++) {
+    lcd.write(screenMem[xg]);
+  }
+  lcd.cursor();
+}
 
+static void lcdChar(byte c) {
+  if (c != 13 and c != 10 and c != 8) {
+    screenMem[16 + cursorX] = c;
+    cursorX += 1;
+    if (cursorX < 16) {
+      lcd.write(c);
+    }
+  }
+  if (cursorX == 16 or c == 10) {
+    for (int xg = 0 ; xg < 16 ; xg++) {
+      screenMem[0 + xg] = screenMem[16 + xg];
+      screenMem[16 + xg] = 32;
+    }
+    cursorX = 0;
+    doFrame(32);
+  }
+}
 
 void c_putch(char c) {
   Serial.write(c);
-  //  lcd.print(c);
-  lcdOut(c);
-
+  lcdChar(c);
 }
+
 char c_getch() {
   return Serial.read();
 }
@@ -32,8 +56,9 @@ char c_kbhit() {
   return Serial.available();
 }
 void newline(void) {
-  c_putch(13); //CR
-  c_putch(10); //LF
+  //c_putch(13); //CR
+  //c_putch(10); //LF
+  c_putch('\n'); //LF
 }
 boolean   basic_stop = false;
 
@@ -1264,24 +1289,21 @@ void icom() {
 
 }
 
-int posX = 0;
-int posY = 1; //(начало самой нижней строки)
-String curLine = "";
-
 void basic() {
   ESP.wdtDisable();
   ESP.wdtEnable(150000);
   basic_stop = false;
   unsigned char len;
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
+  lcd.cursor();
   inew();
   c_puts("TOYOSHIKI TINY BASIC");
   newline();
   c_puts("ARDUINO EDITION");
   newline();
   error(); // Print OK, and Clear error flag
-
+  doFrame(32);
   // Input 1 line and execute
   while (1) {
     yield();
@@ -1313,26 +1335,6 @@ void basic() {
   }
 }
 
-void lcdOut(char c) {
-  boolean newLine = false;
-  if (c == 13) {
-    c = "";
-    newLine = true;
-  }
-  if (c == 10) {
-    c = "";
-  }
-  if (posX <= COLS - 1 && !newLine) {
-    lcd.write(c);
-    curLine+=c;
-    posX++;
-    newLine=false;
-  }
-  else {
-    lcd.setCursor(0, 0);
-    lcd.print(curLine);
-    curLine="";
-  }
-}
+
 
 

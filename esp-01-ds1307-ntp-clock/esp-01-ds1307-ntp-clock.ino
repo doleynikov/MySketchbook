@@ -401,6 +401,9 @@ void ajustRTC() {
       use();
       break;
     case 'b':
+      lcd.init(); // initialize the lcd
+      lcd.clear();
+      lcd.home();
       if (backLight == 1) {
         lcd.noBacklight();
         backLight = 0;
