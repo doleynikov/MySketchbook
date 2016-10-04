@@ -1,0 +1,42 @@
+[
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/cores/esp8266"
+  },
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/variants/generic"
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
+    "Include": "Ticker.h",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/Ticker"
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
+    "Include": "PCD85448266.h",
+    "Includepath": "/home/dimao/MySketchbook/libraries/pcd8544-master"
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/Ticker/Ticker.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/libraries/pcd8544-master/PCD8544.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/libraries/pcd8544-master/charset.cpp",
+    "Include": "",
+    "Includepath": ""
+  }
+]
