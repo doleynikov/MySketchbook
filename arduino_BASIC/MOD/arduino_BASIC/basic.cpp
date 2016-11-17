@@ -87,7 +87,6 @@ int sysGOSUBSTART, sysGOSUBEND;
  const char  string_23[] PROGMEM = "Error in VAL input";
  const char  string_24[] PROGMEM = "Bad parameter";
 
-//PROGMEM const char *errorTable[] = {
 const char * const  errorTable[] PROGMEM = {
     string_0, string_1, string_2, string_3,
     string_4, string_5, string_6, string_7,
@@ -113,7 +112,6 @@ const char * const  errorTable[] PROGMEM = {
 // bits 7,8 formatting
 #define TKN_FMT_POST		0x40
 #define TKN_FMT_PRE		0x80
-
 
 PROGMEM const TokenTableEntry tokenTable[] = {
     {0, 0}, {0, 0}, {0, 0}, {0, 0},

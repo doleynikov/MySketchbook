@@ -1,14 +1,12 @@
 #include <EEPROM.h>
-
+#include <pgmspace.h>
 #include <Ticker.h>
 
-#include <PCD85448266.h>
 
 #include "basic.h"
 #include "host.h"
 
 Ticker timer;
-PCD8544 screen ;
 
 // buzzer pin, 0 = disabled/not present
 #define BUZZER_PIN    0
@@ -32,19 +30,9 @@ void setup() {
   timer.attach(1, timerIsr);
   ESP.wdtDisable();
   ESP.wdtEnable(150000);
-
   Serial.begin(115200);   // opens serial port, sets data rate to 9600 bps
-Serial.println("Begin:");
-  screen.begin(84, 48);
-  screen.setContrast(60);
-
-  screen.clear();
-  screen.setCursor(0, 0);
-  screen.println("!");
-
   reset();
   host_init(BUZZER_PIN);
-  host_cls();
   host_outputProgMemString(welcomeStr);
   // show memory size
   host_outputFreeMem(sysVARSTART - sysPROGEND);
@@ -53,13 +41,11 @@ Serial.println("Begin:");
     autorun = 1;
   else
     host_startupTone();
- 
 }
 
 void loop() {
-  int ii=0;
   int ret = ERROR_NONE;
-  yield();
+  delay(0);
   if (!autorun) {
     // get a line from the user
     char *input = host_readLine();
@@ -69,12 +55,7 @@ void loop() {
       return;
     }
     // otherwise tokenize
-    Serial.print("INPUT:");
-    ii=0;
-    while (input[ii]!=0){ Serial.println(input[ii++]);}
-    
     ret = tokenize((unsigned char*)input, tokenBuf, TOKEN_BUF_SIZE);
-    Serial.println(ret);
   }
   else {
     host_loadProgram();
@@ -85,11 +66,6 @@ void loop() {
   // execute the token buffer
   if (ret == ERROR_NONE) {
     host_newLine();
-
-    Serial.print("NoErrors:");
-    ii=0;
-    while (!tokenBuf[ii]){ Serial.println(tokenBuf[ii++]);}
-
     ret = processInput(tokenBuf);
   }
   if (ret != ERROR_NONE) {

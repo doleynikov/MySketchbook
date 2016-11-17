@@ -10,22 +10,102 @@
     "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/variants/generic"
   },
   {
-    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
-    "Include": "Ticker.h",
-    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/Ticker"
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/ttbasic_ESP8266.ino.cpp",
+    "Include": "ESP8266WiFi.h",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src"
   },
   {
-    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
-    "Include": "PCD85448266.h",
-    "Includepath": "/home/dimao/MySketchbook/libraries/pcd8544-master"
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/ttbasic_ESP8266.ino.cpp",
+    "Include": "ESP8266WebServer.h",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WebServer/src"
   },
   {
-    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/TinyBasicV020W.ino.cpp",
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/ttbasic_ESP8266.ino.cpp",
     "Include": "",
     "Includepath": ""
   },
   {
-    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/Ticker/Ticker.cpp",
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/basic.cpp",
+    "Include": "EEPROM.h",
+    "Includepath": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/EEPROM"
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/basic.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/host.cpp",
+    "Include": "PCD85448266.h",
+    "Includepath": "/home/dimao/MySketchbook/libraries/pcd8544-master"
+  },
+  {
+    "Sourcefile": "/home/dimao/MySketchbook/build/sketch/host.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFi.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFiAP.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFiGeneric.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFiMulti.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFiSTA.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/ESP8266WiFiScan.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/WiFiClient.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/WiFiClientSecure.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/WiFiServer.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src/WiFiUdp.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WebServer/src/ESP8266WebServer.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WebServer/src/Parsing.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/home/dimao/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/EEPROM/EEPROM.cpp",
     "Include": "",
     "Includepath": ""
   },

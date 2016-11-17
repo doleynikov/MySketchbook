@@ -1,10 +1,10 @@
 {
   "builtInLibrariesFolders": "/usr/share/arduino/libraries",
-  "customBuildProperties": "build.warn_data_percentage=75,runtime.tools.xtensa-lx106-elf-gcc.path=/home/dimao/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2,runtime.tools.mkspiffs.path=/home/dimao/.arduino15/packages/esp8266/tools/mkspiffs/0.1.2,runtime.tools.esptool.path=/home/dimao/.arduino15/packages/esp8266/tools/esptool/0.4.9",
-  "fqbn": "esp8266:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,ResetMethod=ck,Debug=Serial,DebugLevel=all_____",
+  "customBuildProperties": "build.warn_data_percentage=75,runtime.tools.mkspiffs.path=/home/dimao/.arduino15/packages/esp8266/tools/mkspiffs/0.1.2,runtime.tools.esptool.path=/home/dimao/.arduino15/packages/esp8266/tools/esptool/0.4.9,runtime.tools.xtensa-lx106-elf-gcc.path=/home/dimao/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2",
+  "fqbn": "esp8266:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,ResetMethod=ck,Debug=Serial,DebugLevel=None____",
   "hardwareFolders": "/usr/share/arduino/hardware,/home/dimao/.arduino15/packages",
   "otherLibrariesFolders": "/home/dimao/MySketchbook/libraries",
   "runtime.ide.version": "10612",
-  "sketchLocation": "/home/dimao/MySketchbook/TinyBasicV020W/TinyBasicV020W.ino",
+  "sketchLocation": "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino",
   "toolsFolders": "/usr/share/arduino/tools-builder,/usr/share/arduino/hardware/tools/avr,/home/dimao/.arduino15/packages"
 }

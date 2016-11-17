@@ -1,11 +1,16 @@
 #include "host.h"
 #include "basic.h"
+#include <Ticker.h>
+Ticker timer;
 
-#include <SSD1306ASCII.h>
+//#include <SSD1306ASCII.h>
+#include <PCD85448266.h>
+
 #include <PS2Keyboard.h>
 #include <EEPROM.h>
 
-extern SSD1306ASCII oled;
+//extern SSD1306ASCII display;
+extern PCD8544 display;
 extern PS2Keyboard keyboard;
 extern EEPROMClass EEPROM;
 int timer1_counter;
@@ -20,28 +25,27 @@ char buzPin = 0;
 
 const char bytesFreeStr[] PROGMEM = "bytes free";
 
-void initTimer() {
-    noInterrupts();           // disable all interrupts
-    TCCR1A = 0;
-    TCCR1B = 0;
-    timer1_counter = 34286;   // preload timer 65536-16MHz/256/2Hz
-    TCNT1 = timer1_counter;   // preload timer
-    TCCR1B |= (1 << CS12);    // 256 prescaler 
-    TIMSK1 |= (1 << TOIE1);   // enable timer overflow interrupt
-    interrupts();             // enable all interrupts
+void timerIsr()
+{
+  ESP.wdtFeed();
+  Serial.println(".");
+  delay(0);
 }
 
-ISR(TIMER1_OVF_vect)        // interrupt service routine 
-{
-    TCNT1 = timer1_counter;   // preload timer
-    flash = !flash;
-    redraw = 1;
+void initTimer() {
+    noInterrupts();           // disable all interrupts
+    ESP.wdtDisable();
+  timer.attach(1, timerIsr);
+    interrupts();             // enable all interrupts
+    ESP.wdtEnable(150000);
 }
 
 
 void host_init(int buzzerPin) {
     buzPin = buzzerPin;
-    oled.clear();
+    display.clear();
+    display.setCursor(0, 0);
+
     if (buzPin)
         pinMode(buzPin, OUTPUT);
     initTimer();
@@ -104,18 +108,22 @@ void host_moveCursor(int x, int y) {
 }
 
 void host_showBuffer() {
+  Serial.printf("===== showbuffer start =====\n");
     for (int y=0; y<SCREEN_HEIGHT; y++) {
+  Serial.printf("showbuffer y=%d\n",y);
         if (lineDirty[y] || (inputMode && y==curY)) {
-            oled.setCursor(0,y);
+            display.setCursor(0,y);
             for (int x=0; x<SCREEN_WIDTH; x++) {
                 char c = screenBuffer[y*SCREEN_WIDTH+x];
+  Serial.printf("showbuffer c=%c (%d)\n",c,c);
                 if (c<32) c = ' ';
                 if (x==curX && y==curY && inputMode && flash) c = 127;
-                oled.print(c);
+                display.print(c);
             }
             lineDirty[y] = 0;
         }
     }
+  Serial.printf("===== showbuffer finish =====\n");
 }
 
 void scrollBuffer() {
@@ -187,11 +195,13 @@ char *host_floatToStr(float f, char *buf) {
     }
     else if (a<0.0001 || a>1000000) {
         // this will output -1.123456E99 = 13 characters max including trailing nul
-        dtostre(f, buf, 6, 0);
+//        dtostre(f, buf, 6, 0);
+        dtostrf(f, 0, 6, buf);
+
     }
     else {
         int decPos = 7 - (int)(floor(log10(a))+1.0f);
-        dtostrf(f, 1, decPos, buf);
+        (f, 1, decPos, buf);
         if (decPos) {
             // remove trailing 0s
             char *p = buf;
@@ -231,11 +241,13 @@ char *host_readLine() {
 
     bool done = false;
     while (!done) {
-        while (keyboard.available()) {
+//        while (keyboard.available()) {
+        while (Serial.available()) {
             host_click();
             // read the next key
             lineDirty[pos / SCREEN_WIDTH] = 1;
-            char c = keyboard.read();
+//            char c = keyboard.read();
+            char c = Serial.read();
             if (c>=32 && c<=126)
                 screenBuffer[pos++] = c;
             else if (c==PS2_DELETE && pos > startPos)
@@ -280,9 +292,11 @@ char host_getKey() {
 }
 
 bool host_ESCPressed() {
-    while (keyboard.available()) {
+//    while (keyboard.available()) {
+    while (Serial.available()) {
         // read the next key
-        inkeyChar = keyboard.read();
+//        inkeyChar = keyboard.read();
+        inkeyChar = Serial.read();
         if (inkeyChar == PS2_ESC)
             return true;
     }
@@ -312,123 +326,5 @@ void host_loadProgram() {
         mem[i] = EEPROM.read(i+3);
 }
 
-#if EXTERNAL_EEPROM
-#include <I2cMaster.h>
-extern TwiMaster rtc;
 
-void writeExtEEPROM(unsigned int address, byte data) 
-{
-  if (address % 32 == 0) host_click();
-  rtc.start((EXTERNAL_EEPROM_ADDR<<1)|I2C_WRITE);
-  rtc.write((int)(address >> 8));   // MSB
-  rtc.write((int)(address & 0xFF)); // LSB
-  rtc.write(data);
-  rtc.stop();
-  delay(5);
-}
- 
-byte readExtEEPROM(unsigned int address) 
-{
-  rtc.start((EXTERNAL_EEPROM_ADDR<<1)|I2C_WRITE);
-  rtc.write((int)(address >> 8));   // MSB
-  rtc.write((int)(address & 0xFF)); // LSB
-  rtc.restart((EXTERNAL_EEPROM_ADDR<<1)|I2C_READ);
-  byte b = rtc.read(true);
-  rtc.stop();
-  return b;
-}
-
-// get the EEPROM address of a file, or the end if fileName is null
-unsigned int getExtEEPROMAddr(char *fileName) {
-    unsigned int addr = 0;
-    while (1) {
-        unsigned int len = readExtEEPROM(addr) | (readExtEEPROM(addr+1) << 8);
-        if (len == 0) break;
-        
-        if (fileName) {
-            bool found = true;
-            for (int i=0; i<=strlen(fileName); i++) {
-                if (fileName[i] != readExtEEPROM(addr+2+i)) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) return addr;
-        }
-        addr += len;
-    }
-    return fileName ? EXTERNAL_EEPROM_SIZE : addr;
-}
-
-void host_directoryExtEEPROM() {
-    unsigned int addr = 0;
-    while (1) {
-        unsigned int len = readExtEEPROM(addr) | (readExtEEPROM(addr+1) << 8);
-        if (len == 0) break;
-        int i = 0;
-        while (1) {
-            char ch = readExtEEPROM(addr+2+i);
-            if (!ch) break;
-            host_outputChar(readExtEEPROM(addr+2+i));
-            i++;
-        }
-        addr += len;
-        host_outputChar(' ');
-    }
-    host_outputFreeMem(EXTERNAL_EEPROM_SIZE - addr - 2);
-}
-
-bool host_removeExtEEPROM(char *fileName) {
-    unsigned int addr = getExtEEPROMAddr(fileName);
-    if (addr == EXTERNAL_EEPROM_SIZE) return false;
-    unsigned int len = readExtEEPROM(addr) | (readExtEEPROM(addr+1) << 8);
-    unsigned int last = getExtEEPROMAddr(NULL);
-    unsigned int count = 2 + last - (addr + len);
-    while (count--) {
-        byte b = readExtEEPROM(addr+len);
-        writeExtEEPROM(addr, b);
-        addr++;
-    }
-    return true;    
-}
-
-bool host_loadExtEEPROM(char *fileName) {
-    unsigned int addr = getExtEEPROMAddr(fileName);
-    if (addr == EXTERNAL_EEPROM_SIZE) return false;
-    // skip filename
-    addr += 2;
-    while (readExtEEPROM(addr++)) ;
-    sysPROGEND = readExtEEPROM(addr) | (readExtEEPROM(addr+1) << 8);
-    for (int i=0; i<sysPROGEND; i++)
-        mem[i] = readExtEEPROM(addr+2+i);
-}
-
-bool host_saveExtEEPROM(char *fileName) {
-    unsigned int addr = getExtEEPROMAddr(fileName);
-    if (addr != EXTERNAL_EEPROM_SIZE)
-        host_removeExtEEPROM(fileName);
-    addr = getExtEEPROMAddr(NULL);
-    unsigned int fileNameLen = strlen(fileName);
-    unsigned int len = 2 + fileNameLen + 1 + 2 + sysPROGEND;
-    if ((long)EXTERNAL_EEPROM_SIZE - addr - len - 2 < 0)
-        return false;
-    // write overall length
-    writeExtEEPROM(addr++, len & 0xFF);
-    writeExtEEPROM(addr++, (len >> 8) & 0xFF);
-    // write filename
-    for (int i=0; i<strlen(fileName); i++)
-        writeExtEEPROM(addr++, fileName[i]);
-    writeExtEEPROM(addr++, 0);
-    // write length & program    
-    writeExtEEPROM(addr++, sysPROGEND & 0xFF);
-    writeExtEEPROM(addr++, (sysPROGEND >> 8) & 0xFF);
-    for (int i=0; i<sysPROGEND; i++)
-        writeExtEEPROM(addr++, mem[i]);
-    // 0 length marks end
-    writeExtEEPROM(addr++, 0);
-    writeExtEEPROM(addr++, 0);
-    return true;
-}
-
-#endif
 

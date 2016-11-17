@@ -39,6 +39,7 @@
  * ---------------------------------------------------------------------------
  */
 
+
 // TODO
 // ABS, SIN, COS, EXP etc
 // DATA, READ, RESTORE
@@ -51,10 +52,12 @@
 #include <float.h>
 #include <limits.h>
 
+#include <Arduino.h> //needed for Serial.println
+
 #include "basic.h"
 #include "host.h"
 
-#include <avr/pgmspace.h>
+#include <pgmspace.h>
 
 int sysPROGEND;
 int sysSTACKSTART, sysSTACKEND;
@@ -800,8 +803,12 @@ int nextToken()
                 gotDecimal = true;
             else {
                 *tokenOut++ = TOKEN_INTEGER;
-                *(long*)tokenOut = (long)val;
+Serial.printf("nextToken: val=%d\n",val);                
+///////////////////////////////////////////////////////////////                
+                *(long*)tokenOut = val;
+Serial.printf("nextToken: 1\n");                
                 tokenOut += sizeof(long);
+Serial.printf("nextToken: 2\n");                
             }
         }
         if (gotDecimal)
@@ -898,7 +905,10 @@ int tokenize(unsigned char *input, unsigned char *output, int outputSize)
     tokenOut = output;
     tokenOutLeft = outputSize;
     int ret;
+  Serial.printf("tokenize 1 input=%s\n",input);
+    
     while (1) {
+  Serial.printf("tokenize 2 ret=%s\n",ret);
         ret = nextToken();
         if (ret) break;
     }
@@ -927,8 +937,11 @@ static long numIntVal;
 
 int getNextToken()
 {
+   Serial.printf("nexttoken start\n"); 
     prevToken = tokenBuffer;
+   Serial.printf("nexttoken 1 prevToken=%s\n",prevToken); 
     curToken = *tokenBuffer++;
+   Serial.printf("nexttoken 2 curToken=%s\n",curToken); 
     if (curToken == TOKEN_IDENT) {
         int i=0;
         while (*tokenBuffer < 0x80)
@@ -1701,25 +1714,7 @@ int parseLoadSaveCmd() {
 
     if (executeMode) {
         if (gotFileName) {
-#if EXTERNAL_EEPROM
-            char fileName[MAX_IDENT_LEN+1];
-            if (strlen(stackGetStr()) > MAX_IDENT_LEN)
-                return ERROR_BAD_PARAMETER;
-            strcpy(fileName, stackPopStr());
-            if (op == TOKEN_SAVE) {
-                if (!host_saveExtEEPROM(fileName))
-                    return ERROR_OUT_OF_MEMORY;
-            }
-            else if (op == TOKEN_LOAD) {
-                reset();
-                if (!host_loadExtEEPROM(fileName))
-                    return ERROR_BAD_PARAMETER;
-            }
-            else if (op == TOKEN_DELETE) {
-                if (!host_removeExtEEPROM(fileName))
-                    return ERROR_BAD_PARAMETER;
-            }
-#endif
+
         }
         else {
             if (op == TOKEN_SAVE)
@@ -1768,9 +1763,7 @@ int parseSimpleCmd() {
                 host_showBuffer();
                 break;
             case TOKEN_DIR:
-#if EXTERNAL_EEPROM
-                host_directoryExtEEPROM();
-#endif
+
                 break;
         }
     }

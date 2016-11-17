@@ -132,8 +132,8 @@ void setup() {
 
 void loop() {
   LCDString("Hello");
-  gotoXY(0, 1);
-  delay(0);
+//  gotoXY(0, 1);
+  delay(1000);
   LCDString("Hello");
 }
 

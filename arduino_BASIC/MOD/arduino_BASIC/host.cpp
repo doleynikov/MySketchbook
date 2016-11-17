@@ -1,10 +1,8 @@
 #include "host.h"
 #include "basic.h"
-
-#include <PCD85448266.h>
+#include <pgmspace.h>
+#include <Arduino.h>
 #define echo 1
-
-extern PCD8544 screen;
 
 char screenBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
 char lineDirty[SCREEN_HEIGHT];
@@ -15,19 +13,15 @@ char inputMode = 0;
 char inkeyChar = 0;
 char buzPin = 0;
 
-const char  bytesFreeStr[] PROGMEM = "bytes free";
+const char bytesFreeStr[] PROGMEM = "bytes free";
 
 void host_init(int buzzerPin) {
-  Serial.println("host_init");
   buzPin = buzzerPin;
-  screen.clear();
   if (buzPin)
     pinMode(buzPin, OUTPUT);
-  //    initTimer();
 }
 
 void host_sleep(long ms) {
-  Serial.println("host_sleep");
   delay(ms);
 }
 
@@ -48,7 +42,6 @@ void host_pinMode(int pin, int mode) {
 }
 
 void host_click() {
-  Serial.println("host_click");
   if (!buzPin) return;
   digitalWrite(buzPin, HIGH);
   delay(1);
@@ -56,7 +49,6 @@ void host_click() {
 }
 
 void host_startupTone() {
-  Serial.println("host_startupTone");
   if (!buzPin) return;
   for (int i = 1; i <= 2; i++) {
     for (int j = 0; j < 50 * i; j++) {
@@ -72,31 +64,24 @@ void host_startupTone() {
 //display module (display and serial)
 
 void host_cls() {
-  Serial.println("host_cls");
-  screen.clear();
+  Serial.println("CLS:");
 }
 
 void host_moveCursor(int x, int y) {
   Serial.println("host_moveCursor");
-  screen.setCursor(x, y);
 }
 
 void host_outputString(char *str) {
-  Serial.print("host_outputString:");
-  Serial.println(*str);
   while (*str) {
     host_outputChar(*str++);
   }
 }
 
 void host_outputChar(char c) {
-  Serial.println("host_outputChar:");
   Serial.print(c);
-  screen.print(c);
 }
 
 void host_outputProgMemString(const char *p) {
-  Serial.println("host_outputProgMemString");
   while (1) {
     unsigned char c = pgm_read_byte(p++);
     if (c == 0) break;
@@ -159,7 +144,8 @@ void host_outputFloat(float f) {
 }
 
 void host_newLine() {
-  host_outputChar('\r\n');
+  host_outputChar('\r');
+  host_outputChar('\n');
 }
 
 //чтение символов

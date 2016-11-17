@@ -316,7 +316,7 @@ void Adafruit_PCD8544::display(void) {
     if ( yUpdateMin >= ((p+1)*8) ) {
       continue;   // nope, skip it!
     }
-    if (yUpdateMax < (p+1)*8) {
+    if (yUpdateMax < p*8) {
       break;
     }
 #endif
