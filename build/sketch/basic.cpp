@@ -13,8 +13,8 @@
 // TO-DO Rewrite defined values to fit your machine as needed
 #define SIZE_LINE 80 //Command line buffer length + NULL
 #define SIZE_IBUF 80 //i-code conversion buffer size
-#define SIZE_LIST 255 //List buffer size
-#define SIZE_ARRY 32 //Array area size
+#define SIZE_LIST 1024 //List buffer size
+#define SIZE_ARRY 255 //Array area size
 #define SIZE_GSTK 6 //GOSUB stack size(2/nest)
 #define SIZE_LSTK 15 //FOR stack size(5/nest)
 
@@ -851,7 +851,7 @@ void iprint() {
     }
   } //文末まで繰り返すの末尾
 
-  newline(); //改行
+  if (*cip != I_SEMI) newline(); //改行
 }
 
 // INPUT handler

@@ -5,6 +5,6 @@
   "hardwareFolders": "/usr/share/arduino/hardware,/home/dimao/.arduino15/packages",
   "otherLibrariesFolders": "/home/dimao/MySketchbook/libraries",
   "runtime.ide.version": "10612",
-  "sketchLocation": "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino",
+  "sketchLocation": "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino",
   "toolsFolders": "/usr/share/arduino/tools-builder,/usr/share/arduino/hardware/tools/avr,/home/dimao/.arduino15/packages"
 }

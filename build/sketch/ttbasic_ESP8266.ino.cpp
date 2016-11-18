@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#line 1 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
-#line 1 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 1 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 1 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 /*
   TOYOSHIKI Tiny BASIC for Arduino
  (C)2012 Tetsuya Suzuki
@@ -22,13 +22,13 @@ ESP8266WebServer server(80);
 
 void basic(void);
 
-#line 22 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 22 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 void setup(void);
-#line 47 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 47 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 void loop(void);
-#line 52 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 52 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 void handleRoot();
-#line 22 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+#line 22 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 void setup(void){
   // put your setup code here, to run once:
   Serial.begin(9600);

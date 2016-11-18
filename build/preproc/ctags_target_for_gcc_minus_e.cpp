@@ -1,14 +1,14 @@
-# 1 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
-# 1 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+# 1 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
+# 1 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino"
 /*
   TOYOSHIKI Tiny BASIC for Arduino
  (C)2012 Tetsuya Suzuki
  */
 //#include <PCD85448266.h>
-# 7 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
-# 8 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
-# 9 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
-# 10 "/home/dimao/MEGAsync/ESP8266/ttbasic_ESP8266/copy/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
+# 7 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
+# 8 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
+# 9 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
+# 10 "/home/dimao/MySketchbook/ttbasic_ESP8266/ttbasic_ESP8266.ino" 2
 
 // PCD8544 lcd;
 
