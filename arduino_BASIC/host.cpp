@@ -1,22 +1,30 @@
 #include "host.h"
 #include "basic.h"
-#include <Ticker.h>
-Ticker timer;
-
-//#include <SSD1306ASCII.h>
-#include <PCD85448266.h>
-
 #include <PS2Keyboard.h>
 #include <EEPROM.h>
+#include <Ticker.h>
+#include <PCD85448266.h>
+#define KEY_ENTER PS2_ENTER
+#define SCREEN_WIDTH        14
+#define SCREEN_HEIGHT       6
 
-//extern SSD1306ASCII display;
-extern PCD8544 display;
+#define SIZE_LINE 64
+#define LCD_W 14
+#define LCD_H 6
+
+PCD8544 lcd;
+Ticker timer;
+
+int lcdX = 0;
+int lcdY = LCD_H-1; // start from the bottom line. Then - scrollUp
+char screen[LCD_H][LCD_W];
+char lbuf[SIZE_LINE]; //Command line buffer
+
+
 extern PS2Keyboard keyboard;
 extern EEPROMClass EEPROM;
-int timer1_counter;
+int timer1_counter=0; // time since boot
 
-char screenBuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
-char lineDirty[SCREEN_HEIGHT];
 int curX = 0, curY = 0;
 volatile char flash = 0, redraw = 0;
 char inputMode = 0;
@@ -28,7 +36,7 @@ const char bytesFreeStr[] PROGMEM = "bytes free";
 void timerIsr()
 {
   ESP.wdtFeed();
-  Serial.println(".");
+  timer1_counter++;
   delay(0);
 }
 
@@ -37,15 +45,109 @@ void initTimer() {
     ESP.wdtDisable();
   timer.attach(1, timerIsr);
     interrupts();             // enable all interrupts
-    ESP.wdtEnable(150000);
+    ESP.wdtEnable(1000);
 }
 
 
+//*****************************************************************************************
+
+void host_moveCursor(int x, int y) {
+    if (x<0) x = 0;
+    if (x>=SCREEN_WIDTH) x = SCREEN_WIDTH-1;
+    if (y<0) y = 0;
+    if (y>=SCREEN_HEIGHT) y = SCREEN_HEIGHT-1;
+  lcd.setCursor(x, y);
+lcdX=x;
+lcdY=y;  
+
+}
+void host_outchar(char c)
+{
+  lcd.write(c);
+  }
+
+void host_display_clear_rest()
+{
+  host_moveCursor(lcdX, lcdY);         // cursor to original position
+  for (int i = lcdX; i < LCD_W; i++) // clear the rest of line
+  {
+    host_outchar(' ');
+    screen[lcdY][i] = ' ';
+  }
+  host_moveCursor(lcdX, lcdY);         //return cursor to original position
+//  Serial.println("clear rest("+String(lcdX)+","+String(lcdY)+")");
+}
+
+void host_display_scroll()
+{
+  host_moveCursor(0, 0);
+  for (int y = 0; y < LCD_H - 1; y++) //move screen one line up
+  {
+    for (int x = 0; x < LCD_W; x++)
+    {
+      screen[y][x] = screen[y + 1][x];
+      host_outchar(screen[y + 1][x]);
+    }
+  }
+  host_moveCursor(lcdX, lcdY);         //return cursor to original position
+  host_display_clear_rest();
+//        Serial.println("scroll ("+String(lcdX)+","+String(lcdY)+")");
+}
+
+void host_display_write(char c)
+{
+  if (c != 13 && c != 10) // regular character
+  {
+    if (lcdX >= LCD_W) // is x-position out of the screen?
+    {
+      lcdX = 0;
+      host_display_scroll();
+    }
+    host_outchar(c);
+    screen[lcdY][lcdX] = c;
+    lcdX++;
+  }
+  else if (c == 8) {
+   lcdX--;
+  host_moveCursor(lcdX, lcdY);
+   
+  }//LineFeed - next line
+
+  else if (c == 10) {
+    host_display_scroll();
+    host_display_clear_rest();
+  }//LineFeed - next line
+  else if (c == 13) {
+    lcdX = 0;
+  }//CR - first position of current line
+  host_moveCursor(lcdX, lcdY);
+}
+
+void host_display_init()
+{
+  lcd.begin(84, 48);
+  lcd.clear();
+  host_moveCursor(0, 0);
+  
+  lcd.setContrast(90);
+}
+
+void host_display_cls()
+{
+  lcd.clear();
+  host_moveCursor(0, 0);
+lcdX=0;
+lcdY=LCD_H-1;  
+}
+
+void host_cls() {
+host_display_cls(); 
+}
+//*****************************************************************************************
+
 void host_init(int buzzerPin) {
     buzPin = buzzerPin;
-    display.clear();
-    display.setCursor(0, 0);
-
+   host_display_init();
     if (buzPin)
         pinMode(buzPin, OUTPUT);
     initTimer();
@@ -91,60 +193,10 @@ void host_startupTone() {
     }    
 }
 
-void host_cls() {
-    memset(screenBuffer, 32, SCREEN_WIDTH*SCREEN_HEIGHT);
-    memset(lineDirty, 1, SCREEN_HEIGHT);
-    curX = 0;
-    curY = 0;
-}
-
-void host_moveCursor(int x, int y) {
-    if (x<0) x = 0;
-    if (x>=SCREEN_WIDTH) x = SCREEN_WIDTH-1;
-    if (y<0) y = 0;
-    if (y>=SCREEN_HEIGHT) y = SCREEN_HEIGHT-1;
-    curX = x;
-    curY = y; 
-}
-
-void host_showBuffer() {
-  Serial.printf("===== showbuffer start =====\n");
-    for (int y=0; y<SCREEN_HEIGHT; y++) {
-  Serial.printf("showbuffer y=%d\n",y);
-        if (lineDirty[y] || (inputMode && y==curY)) {
-            display.setCursor(0,y);
-            for (int x=0; x<SCREEN_WIDTH; x++) {
-                char c = screenBuffer[y*SCREEN_WIDTH+x];
-  Serial.printf("showbuffer c=%c (%d)\n",c,c);
-                if (c<32) c = ' ';
-                if (x==curX && y==curY && inputMode && flash) c = 127;
-                display.print(c);
-            }
-            lineDirty[y] = 0;
-        }
-    }
-  Serial.printf("===== showbuffer finish =====\n");
-}
-
-void scrollBuffer() {
-    memcpy(screenBuffer, screenBuffer + SCREEN_WIDTH, SCREEN_WIDTH*(SCREEN_HEIGHT-1));
-    memset(screenBuffer + SCREEN_WIDTH*(SCREEN_HEIGHT-1), 32, SCREEN_WIDTH);
-    memset(lineDirty, 1, SCREEN_HEIGHT);
-    curY--;
-}
-
 void host_outputString(char *str) {
-    int pos = curY*SCREEN_WIDTH+curX;
     while (*str) {
-        lineDirty[pos / SCREEN_WIDTH] = 1;
-        screenBuffer[pos++] = *str++;
-        if (pos >= SCREEN_WIDTH*SCREEN_HEIGHT) {
-            scrollBuffer();
-            pos -= SCREEN_WIDTH;
-        }
+        host_outputChar(*str++);
     }
-    curX = pos % SCREEN_WIDTH;
-    curY = pos / SCREEN_WIDTH;
 }
 
 void host_outputProgMemString(const char *p) {
@@ -156,15 +208,7 @@ void host_outputProgMemString(const char *p) {
 }
 
 void host_outputChar(char c) {
-    int pos = curY*SCREEN_WIDTH+curX;
-    lineDirty[pos / SCREEN_WIDTH] = 1;
-    screenBuffer[pos++] = c;
-    if (pos >= SCREEN_WIDTH*SCREEN_HEIGHT) {
-        scrollBuffer();
-        pos -= SCREEN_WIDTH;
-    }
-    curX = pos % SCREEN_WIDTH;
-    curY = pos / SCREEN_WIDTH;
+host_display_write(c);
 }
 
 int host_outputInt(long num) {
@@ -195,13 +239,11 @@ char *host_floatToStr(float f, char *buf) {
     }
     else if (a<0.0001 || a>1000000) {
         // this will output -1.123456E99 = 13 characters max including trailing nul
-//        dtostre(f, buf, 6, 0);
-        dtostrf(f, 0, 6, buf);
-
+        dtostrf(f,  0,6,buf);
     }
     else {
         int decPos = 7 - (int)(floor(log10(a))+1.0f);
-        (f, 1, decPos, buf);
+        dtostrf(f, 1, decPos, buf);
         if (decPos) {
             // remove trailing 0s
             char *p = buf;
@@ -222,81 +264,57 @@ void host_outputFloat(float f) {
 }
 
 void host_newLine() {
-    curX = 0;
-    curY++;
-    if (curY == SCREEN_HEIGHT)
-        scrollBuffer();
-    memset(screenBuffer + SCREEN_WIDTH*(curY), 32, SCREEN_WIDTH);
-    lineDirty[curY] = 1;
+host_outputChar(13);
+host_outputChar(10);
 }
-
+int host_getch() {
+  delay(1);  //Soft WDT対策
+  return Serial.read();
+}
+int host_kbhit() {
+  delay(1);  //Soft WDT対策
+  return Serial.available();
+}
+char c_isprint(char c) {
+  return (c >= 32 && c <= 126);
+}
+char c_isspace(char c) {
+  return (c == ' ' || (c <= 13 && c >= 9));
+}
 char *host_readLine() {
-    inputMode = 1;
+  char c;  
+  unsigned char len; 
+  len = 0;  
+  while ((c = host_getch()) != KEY_ENTER) { 
+    if (c == 9) c = ' '; 
+    if (((c == 8) || (c == 127)) && (len > 0)) {
+      len--; 
+      host_display_write(8); host_display_write(' '); host_display_write(8); 
+    } else
+      if (c_isprint(c) && (len < (SIZE_LINE - 1))) {
+        lbuf[len++] = c; 
+        host_display_write(c); 
+      }
+    delay(1);
+  }
+  host_newLine();  
+  lbuf[len] = 0;  
 
-    if (curX == 0) memset(screenBuffer + SCREEN_WIDTH*(curY), 32, SCREEN_WIDTH);
-    else host_newLine();
-
-    int startPos = curY*SCREEN_WIDTH+curX;
-    int pos = startPos;
-
-    bool done = false;
-    while (!done) {
-//        while (keyboard.available()) {
-        while (Serial.available()) {
-            host_click();
-            // read the next key
-            lineDirty[pos / SCREEN_WIDTH] = 1;
-//            char c = keyboard.read();
-            char c = Serial.read();
-            if (c>=32 && c<=126)
-                screenBuffer[pos++] = c;
-            else if (c==PS2_DELETE && pos > startPos)
-                screenBuffer[--pos] = 0;
-            else if (c==PS2_ENTER)
-                done = true;
-            curX = pos % SCREEN_WIDTH;
-            curY = pos / SCREEN_WIDTH;
-            // scroll if we need to
-            if (curY == SCREEN_HEIGHT) {
-                if (startPos >= SCREEN_WIDTH) {
-                    startPos -= SCREEN_WIDTH;
-                    pos -= SCREEN_WIDTH;
-                    scrollBuffer();
-                }
-                else
-                {
-                    screenBuffer[--pos] = 0;
-                    curX = pos % SCREEN_WIDTH;
-                    curY = pos / SCREEN_WIDTH;
-                }
-            }
-            redraw = 1;
-        }
-        if (redraw)
-            host_showBuffer();
-    }
-    screenBuffer[pos] = 0;
-    inputMode = 0;
-    // remove the cursor
-    lineDirty[curY] = 1;
-    host_showBuffer();
-    return &screenBuffer[startPos];
+  if (len > 0) {  
+    while (c_isspace(lbuf[--len]));    lbuf[++len] = 0;  
+  }
+  Serial.println(lbuf);
+    return &lbuf[0];
 }
 
 char host_getKey() {
-    char c = inkeyChar;
-    inkeyChar = 0;
-    if (c >= 32 && c <= 126)
-        return c;
-    else return 0;
+    return host_getch();
 }
 
 bool host_ESCPressed() {
-//    while (keyboard.available()) {
-    while (Serial.available()) {
+    while (host_kbhit()) {
         // read the next key
-//        inkeyChar = keyboard.read();
-        inkeyChar = Serial.read();
+        inkeyChar = host_getKey();
         if (inkeyChar == PS2_ESC)
             return true;
     }
@@ -326,5 +344,5 @@ void host_loadProgram() {
         mem[i] = EEPROM.read(i+3);
 }
 
-
+void host_showBuffer(){}
 

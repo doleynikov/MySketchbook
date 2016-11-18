@@ -5,13 +5,12 @@
 #define LCD_H 6
 PCD8544 lcd;
 int lcdX = 0;
-int lcdY = 5; // start from the bottom line. Then - scrollUp
+int lcdY = LCD_H-1; // start from the bottom line. Then - scrollUp
 char screen[LCD_H][LCD_W];
 
 void host_outchar(char c)
 {
   lcd.write(c);
-//  Serial.println("LCD("+String(lcdX)+","+String(lcdY)+"):"+(char)c);
   }
 
 void host_display_clear_rest()
@@ -24,7 +23,6 @@ void host_display_clear_rest()
   }
   lcd.setCursor(lcdX, lcdY);         //return cursor to original position
 //  Serial.println("clear rest("+String(lcdX)+","+String(lcdY)+")");
-
 }
 
 void host_display_scroll()
@@ -61,7 +59,6 @@ void host_display_write(char c)
     host_display_scroll();
  //     Serial.println("LF ("+String(lcdX)+","+String(lcdY)+")");
     host_display_clear_rest();
-
   }//LineFeed - next line
   else if (c == 13) {
     lcdX = 0;
@@ -75,7 +72,22 @@ void host_display_init()
   lcd.begin(84, 48);
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.setContrast(40);
+  lcd.setContrast(90);
 }
 
+void host_display_cls()
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+lcdX=0;
+lcdY=LCD_H-1;  
+}
+int host_getch() {
+  delay(1);  //Soft WDT対策
+  return Serial.read();
+}
+int host_kbhit() {
+  delay(1);  //Soft WDT対策
+  return Serial.available();
+}
 

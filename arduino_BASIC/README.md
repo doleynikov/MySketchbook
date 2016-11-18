@@ -1,5 +1,3 @@
-[https://github.com/robinhedwards/ArduinoBASIC]
-
 Arduino Basic
 =============
 Now you can turn your Arduino into an 80's home computer!

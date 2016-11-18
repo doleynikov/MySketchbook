@@ -39,7 +39,6 @@
  * ---------------------------------------------------------------------------
  */
 
-
 // TODO
 // ABS, SIN, COS, EXP etc
 // DATA, READ, RESTORE
@@ -51,8 +50,6 @@
 #include <math.h>
 #include <float.h>
 #include <limits.h>
-
-#include <Arduino.h> //needed for Serial.println
 
 #include "basic.h"
 #include "host.h"
@@ -803,12 +800,8 @@ int nextToken()
                 gotDecimal = true;
             else {
                 *tokenOut++ = TOKEN_INTEGER;
-Serial.printf("nextToken: val=%d\n",val);                
-///////////////////////////////////////////////////////////////                
-                *(long*)tokenOut = val;
-Serial.printf("nextToken: 1\n");                
+                *(long*)tokenOut = (long)val;
                 tokenOut += sizeof(long);
-Serial.printf("nextToken: 2\n");                
             }
         }
         if (gotDecimal)
@@ -905,10 +898,7 @@ int tokenize(unsigned char *input, unsigned char *output, int outputSize)
     tokenOut = output;
     tokenOutLeft = outputSize;
     int ret;
-  Serial.printf("tokenize 1 input=%s\n",input);
-    
     while (1) {
-  Serial.printf("tokenize 2 ret=%s\n",ret);
         ret = nextToken();
         if (ret) break;
     }
@@ -937,11 +927,8 @@ static long numIntVal;
 
 int getNextToken()
 {
-   Serial.printf("nexttoken start\n"); 
     prevToken = tokenBuffer;
-   Serial.printf("nexttoken 1 prevToken=%s\n",prevToken); 
     curToken = *tokenBuffer++;
-   Serial.printf("nexttoken 2 curToken=%s\n",curToken); 
     if (curToken == TOKEN_IDENT) {
         int i=0;
         while (*tokenBuffer < 0x80)

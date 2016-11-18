@@ -1,9 +1,5 @@
 #include <stdint.h>
 
-#define SCREEN_WIDTH        14
-#define SCREEN_HEIGHT       6
-
-
 
 #define MAGIC_AUTORUN_NUMBER    0xFC
 

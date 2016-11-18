@@ -20,20 +20,20 @@
 
 // Depending on device functions
 // TO-DO Rewrite these functions to fit your machine
-#define STR_EDITION "ARDUINO(ESP8266)"
+#define STR_EDITION "(ESP8266)"
 
 //#define c_getch( ) Serial.read()
 //#define c_kbhit( ) Serial.available()
 int c_getch() {
-  delay(1);  //Soft WDT対策
-  return Serial.read();
+  return host_getch();
 }
 int c_kbhit() {
-  delay(1);  //Soft WDT対策
-  return Serial.available();
+  return host_kbhit();
 }
 void c_putch(char c) {
-  delay(1); Serial.write(c);
+  delay(1); 
+  Serial.write(c);
+
 host_display_write(c);
 }
 
@@ -1381,35 +1381,31 @@ void error() {
 */
 
 void basic() {
-  unsigned char len; //中間コードの長さ
+  unsigned char len;
 
-  inew(); //実行環境を初期化
-
-  //起動メッセージ
-  newline(); //改行
-  c_puts("TOYOSHIKI TINY BASIC"); //「TOYOSHIKI TINY BASIC」を表示
-  newline(); //改行
-  c_puts(STR_EDITION); //版を区別する文字列を表示
-  c_puts(" EDITION"); //「 EDITION」を表示
-  newline(); //改行
+  inew(); 
+  newline(); //
+  c_puts("TINY BASIC"); //TOYOSHIKI TINY BASIC
+  newline(); //
+//  c_puts(STR_EDITION); //
+//  c_puts(" EDITION"); //
+// newline(); //
   if (bootflag() == I_BOOT) {
     c_puts("Power on run"); newline();
     //    flash_read(listbuf);
     iload();
     irun();
   }
-  error(); //「OK」またはエラーメッセージを表示してエラー番号をクリア
+  error(); 
 
-  //端末から1行を入力して実行
-  while (1) { //無限ループ
-    c_putch('>'); //プロンプトを表示
-    c_gets(); //1行を入力
+  while (1) { 
+    c_putch('>'); 
+    c_gets(); 
 
-    //1行の文字列を中間コードの並びに変換
-    len = toktoi(); //文字列を中間コードに変換して長さを取得
-    if (err) { //もしエラーが発生したら
-      error(); //エラーメッセージを表示してエラー番号をクリア
-      continue; //繰り返しの先頭へ戻ってやり直し
+    len = toktoi(); 
+    if (err) { 
+      error(); 
+      continue;
     }
 
     //中間コードの並びがプログラムと判断される場合
