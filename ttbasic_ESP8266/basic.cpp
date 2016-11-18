@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <EEPROM.h>
 #include "host.h"
+#include "FS.h"
 
 // TOYOSHIKI TinyBASIC symbols
 // TO-DO Rewrite defined values to fit your machine as needed
@@ -1231,12 +1232,13 @@ void ilist() {
   short lineno; //
 
   if (*cip == I_NUM) //
-    {lineno = getlineno(cip); //
-    one=true;}
+  { lineno = getlineno(cip); //
+    one = true;
+  }
   else //
     lineno = 0; //
 
-  for ( clp = listbuf; *clp && (getlineno(clp) < lineno); clp += *clp); 
+  for ( clp = listbuf; *clp && (getlineno(clp) < lineno); clp += *clp);
 
   //
   while (*clp) { //
@@ -1246,7 +1248,7 @@ void ilist() {
     if (err) //
       break; //
     if (one)
-      break;  
+      break;
     newline(); //
     clp += *clp; //
   }
@@ -1269,13 +1271,24 @@ void inew(void) {
   clp = listbuf; //行ポインタをプログラム保存領域の先頭に設定
 }
 void isave() {
-  EEPROM.begin(SIZE_LIST + 1);
-  // write a listbuf to all SIZE_LIST+1 bytes of the EEPROM
-  for (int i = 0; i < SIZE_LIST + 1; i++)
-    EEPROM.write(i, listbuf[i]);
-  //  EEPROM.commit();
-  EEPROM.end();
-
+  String fn = "";
+  if (*cip == I_STR)
+  { cip++; 
+    int i = *cip++; 
+    while (i--) fn += char(*cip++);
+  }
+//  Serial.println(fn);
+  if (fn = "") {
+    EEPROM.begin(SIZE_LIST + 1);
+    // write a listbuf to all SIZE_LIST+1 bytes of the EEPROM
+    for (int i = 0; i < SIZE_LIST + 1; i++)
+      EEPROM.write(i, listbuf[i]);
+    //  EEPROM.commit();
+    EEPROM.end();
+  }
+  else
+  {// write SPIFFS file here (then change BOOT command to DIR, RM, etc
+    }
 }
 void iload() {
   EEPROM.begin(SIZE_LIST + 1);
@@ -1302,14 +1315,13 @@ void icom() {
         err = ERR_SYNTAX; //エラー番号をセット
       break; //打ち切る
 
-    case I_LIST: //I_LISTの場合（LIST命令）
-      cip++; //中間コードポインタを次へ進める
-      if (*cip == I_EOL || //もし行末か、あるいは
-          * (cip + 3) == I_EOL) //続いて引数があれば
-        ilist(); //LIST命令を実行
-      else //そうでなければ
-        err = ERR_SYNTAX; //エラー番号をセット
-      break; //打ち切る
+    case I_LIST:
+      cip++;
+      if (*cip == I_EOL || *(cip + 3) == I_EOL)
+        ilist();
+      else
+        err = ERR_SYNTAX;
+      break;
 
     case I_RUN: //I_RUNの場合（RUN命令）
       cip++; //中間コードポインタを次へ進める
@@ -1321,10 +1333,11 @@ void icom() {
       if (*cip == I_BOOT) {
         cip++;
         listbuf[SIZE_LIST] = I_BOOT;
-      } else {
+      }
+      else {
         listbuf[SIZE_LIST] = 0;
       }
-      if (*cip == I_EOL)
+      if (*cip == I_EOL || *cip == I_STR)
         //      flash_write(listbuf);
         isave();
       else
@@ -1388,12 +1401,12 @@ void basic() {
   //  c_puts(STR_EDITION); //
   //  c_puts(" EDITION"); //
   // newline(); //
-  if (bootflag() == I_BOOT) {
-    c_puts("Power on run"); newline();
-    //    flash_read(listbuf);
-    iload();
-    irun();
-  }
+  //  if (bootflag() == I_BOOT) {
+  //    c_puts("Power on run"); newline();
+  //    //    flash_read(listbuf);
+  //    iload();
+  //    irun();
+  //  }
   error();
 
   while (1) {
