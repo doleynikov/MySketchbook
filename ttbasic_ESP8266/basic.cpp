@@ -31,10 +31,10 @@ int c_kbhit() {
   return host_kbhit();
 }
 void c_putch(char c) {
-  delay(1); 
+  delay(1);
   Serial.write(c);
 
-host_display_write(c);
+  host_display_write(c);
 }
 
 #define KEY_ENTER 13
@@ -1221,36 +1221,34 @@ void irun() {
     lp = iexe(); //中間コードを実行して次の行の位置を得る
     if (err) //もしエラーを生じたら
       return; //終了
-    clp = lp; //行ポインタを次の行の位置へ移動
-  } //行ポインタが末尾を指すまで繰り返すの末尾
+    clp = lp; //
+  } //
 }
 
 // LIST command handler
 void ilist() {
-  short lineno; //表示開始行番号
+  boolean one = false;
+  short lineno; //
 
-  //表示開始行番号の設定
-  if (*cip == I_NUM) //もしLIST命令に引数があったら
-    lineno = getlineno(cip); //引数を読み取って表示開始行番号とする
-  else //引数がなければ
-    lineno = 0; //表示開始行番号を0とする
+  if (*cip == I_NUM) //
+    {lineno = getlineno(cip); //
+    one=true;}
+  else //
+    lineno = 0; //
 
-  //行ポインタを表示開始行番号へ進める
-  for ( //次の手順で繰り返す
-    clp = listbuf; //行ポインタを先頭行へ設定
-    //末尾ではなくて表示開始行より前なら繰り返す
-    *clp && (getlineno(clp) < lineno);
-    clp += *clp); //行ポインタを次の行へ進める
+  for ( clp = listbuf; *clp && (getlineno(clp) < lineno); clp += *clp); 
 
-  //リストを表示する
-  while (*clp) { //行ポインタが末尾を指すまで繰り返す
-    putnum(getlineno(clp), 0); //行番号を表示
-    c_putch(' '); //空白を入れる
-    putlist(clp + 3); //行番号より後ろを文字列に変換して表示
-    if (err) //もしエラーが生じたら
-      break; //繰り返しを打ち切る
-    newline(); //改行
-    clp += *clp; //行ポインタを次の行へ進める
+  //
+  while (*clp) { //
+    putnum(getlineno(clp), 0); //
+    c_putch(' '); //
+    putlist(clp + 3); //
+    if (err) //
+      break; //
+    if (one)
+      break;  
+    newline(); //
+    clp += *clp; //
   }
 }
 
@@ -1383,43 +1381,40 @@ void error() {
 void basic() {
   unsigned char len;
 
-  inew(); 
+  inew();
+  // newline(); //
+  c_puts("TinyBASIC"); //TOYOSHIKI TINY BASIC
   newline(); //
-  c_puts("TINY BASIC"); //TOYOSHIKI TINY BASIC
-  newline(); //
-//  c_puts(STR_EDITION); //
-//  c_puts(" EDITION"); //
-// newline(); //
+  //  c_puts(STR_EDITION); //
+  //  c_puts(" EDITION"); //
+  // newline(); //
   if (bootflag() == I_BOOT) {
     c_puts("Power on run"); newline();
     //    flash_read(listbuf);
     iload();
     irun();
   }
-  error(); 
+  error();
 
-  while (1) { 
-    c_putch('>'); 
-    c_gets(); 
+  while (1) {
+    c_putch('>');
+    c_gets();
 
-    len = toktoi(); 
-    if (err) { 
-      error(); 
+    len = toktoi();
+    if (err) {
+      error();
       continue;
     }
 
-    //中間コードの並びがプログラムと判断される場合
-    if (*ibuf == I_NUM) { //もし中間コードバッファの先頭が行番号なら
-      *ibuf = len; //中間コードバッファの先頭を長さに書き換える
-      inslist(); //中間コードの1行をリストへ挿入
-      if (err) //もしエラーが発生したら
-        error(); //エラーメッセージを表示してエラー番号をクリア
-      continue; //繰り返しの先頭へ戻ってやり直し
+    if (*ibuf == I_NUM) { //
+      *ibuf = len; //
+      inslist(); //
+      if (err) //
+        error(); //
+      continue; //
     }
-
-    //中間コードの並びが命令と判断される場合
-    icom(); //実行する
-    error(); //エラーメッセージを表示してエラー番号をクリア
+    icom(); //
+    error(); //
 
   } //無限ループの末尾
 }
