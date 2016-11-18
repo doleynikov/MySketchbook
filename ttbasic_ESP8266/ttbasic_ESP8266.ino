@@ -7,7 +7,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include "host.h"
-#include "FS.h"
+
 
 // PCD8544 lcd;
 
@@ -23,7 +23,6 @@ void basic(void);
 void setup(void) {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  SPIFFS.begin();
 
   randomSeed(analogRead(0));
   Serial.print("Configuring access point...");

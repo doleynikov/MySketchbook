@@ -1273,12 +1273,11 @@ void inew(void) {
 void isave() {
   String fn = "";
   if (*cip == I_STR)
-  { cip++; 
-    int i = *cip++; 
+  { cip++;
+    int i = *cip++;
     while (i--) fn += char(*cip++);
   }
-//  Serial.println(fn);
-  if (fn = "") {
+  if (fn == "") {
     EEPROM.begin(SIZE_LIST + 1);
     // write a listbuf to all SIZE_LIST+1 bytes of the EEPROM
     for (int i = 0; i < SIZE_LIST + 1; i++)
@@ -1287,15 +1286,49 @@ void isave() {
     EEPROM.end();
   }
   else
-  {// write SPIFFS file here (then change BOOT command to DIR, RM, etc
+  { // write SPIFFS file here (then change BOOT command to DIR, RM, FORMAT etc
+    SPIFFS.begin();
+
+    // open file for writing
+    File f = SPIFFS.open(fn, "w");
+    if (!f)
+      Serial.println("file open failed");
+    else {
+      Serial.println("====== Writing to SPIFFS file =========");
+      for (int i = 0; i < SIZE_LIST + 1; i++) f.write( listbuf[i]);
+      f.close();
     }
+    SPIFFS.end();
+  }
 }
 void iload() {
-  EEPROM.begin(SIZE_LIST + 1);
-  // write a listbuf to all SIZE_LIST+1 bytes of the EEPROM
-  for (int i = 0; i < SIZE_LIST + 1; i++)
-    listbuf[i] = EEPROM.read(i);
+  String fn = "";
+  if (*cip == I_STR)
+  { cip++;
+    int i = *cip++;
+    while (i--) fn += char(*cip++);
+  }
+  if (fn == "") {
+    EEPROM.begin(SIZE_LIST + 1);
+    // write a listbuf to all SIZE_LIST+1 bytes of the EEPROM
+    for (int i = 0; i < SIZE_LIST + 1; i++)
+      listbuf[i] = EEPROM.read(i);
+  }
+    else
+  { // write SPIFFS file here (then change BOOT command to DIR, RM, FORMAT etc
+    SPIFFS.begin();
 
+    // open file for writing
+    File f = SPIFFS.open(fn, "r");
+    if (!f)
+      Serial.println("file open failed");
+    else {
+      Serial.println("====== Reading to SPIFFS file =========");
+      for (int i = 0; i < SIZE_LIST + 1; i++) f.write( listbuf[i]);
+      f.close();
+    }
+    SPIFFS.end();
+  }
 }
 unsigned char bootflag() {
   EEPROM.begin(SIZE_LIST + 1);
@@ -1346,7 +1379,7 @@ void icom() {
 
     case I_LOAD://extend
       cip++;
-      if (*cip == I_EOL)
+      if (*cip == I_EOL || *cip == I_STR)
         //      flash_read(listbuf);
         iload();
       else
