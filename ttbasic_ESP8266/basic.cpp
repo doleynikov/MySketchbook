@@ -64,7 +64,7 @@ const char *kwtbl[] = {
   "@", "RND", "ABS", "SIZE",
   "LIST", "RUN", "NEW",
   "SAVE",//extend
-  "BOOT",//extend
+  "DIR",//extend
   "LOAD",//extend
 };
 
@@ -83,7 +83,7 @@ enum {
   I_ARRAY, I_RND, I_ABS, I_SIZE,
   I_LIST, I_RUN, I_NEW,
   I_SAVE,//extend
-  I_BOOT,//extend
+  I_DIR,//extend
   I_LOAD,//extend
   I_NUM, I_VAR, I_STR,
   I_EOL
@@ -198,6 +198,13 @@ char c_isalpha(char c) {
 void c_puts(const char *s) {
   while (*s) c_putch(*s++); //終端でなければ出力して繰り返す
 }
+
+void c_putstr(String s) {
+  for (int i=0;i<s.length();i++){
+   c_putch(s.charAt(i)); 
+  }
+}
+
 
 void c_gets() {
   char c; //文字
@@ -1288,14 +1295,15 @@ void isave() {
   else
   { // write SPIFFS file here (then change BOOT command to DIR, RM, FORMAT etc
     SPIFFS.begin();
-
+    int fSize = 0;
     // open file for writing
-    File f = SPIFFS.open(fn, "w");
+    File f = SPIFFS.open("/"+fn, "w");
     if (!f)
       Serial.println("file open failed");
     else {
       Serial.println("====== Writing to SPIFFS file =========");
       for (int i = 0; i < SIZE_LIST + 1; i++) f.write( listbuf[i]);
+      f.flush();
       f.close();
     }
     SPIFFS.end();
@@ -1314,153 +1322,201 @@ void iload() {
     for (int i = 0; i < SIZE_LIST + 1; i++)
       listbuf[i] = EEPROM.read(i);
   }
-    else
+  else //if filename is specified
   { // write SPIFFS file here (then change BOOT command to DIR, RM, FORMAT etc
     SPIFFS.begin();
-
+    int fSize = 0;
     // open file for writing
-    File f = SPIFFS.open(fn, "r");
+    File f = SPIFFS.open("/"+fn, "r");
     if (!f)
       Serial.println("file open failed");
     else {
-      Serial.println("====== Reading to SPIFFS file =========");
-      for (int i = 0; i < SIZE_LIST + 1; i++) f.write( listbuf[i]);
+      fSize = f.size();
+      Serial.println("====== Reading to SPIFFS file ========="+String(fSize));
+      for (int i = 0; i < fSize + 1; i++)
+        listbuf[i] = f.read();
       f.close();
     }
     SPIFFS.end();
   }
 }
-unsigned char bootflag() {
-  EEPROM.begin(SIZE_LIST + 1);
-  return EEPROM.read(SIZE_LIST);
-}
-//Command precessor
-void icom() {
-  cip = ibuf; //中間コードポインタを中間コードバッファの先頭に設定
 
-  switch (*cip) { //中間コードポインタが指し示す中間コードによって分岐
-
-    case I_NEW: //I_NEWの場合（NEW命令）
-      cip++; //中間コードポインタを次へ進める
-      if (*cip == I_EOL) //もし行末だったら
-        inew(); //NEW命令を実行
-      else //行末でなければ
-        err = ERR_SYNTAX; //エラー番号をセット
-      break; //打ち切る
-
-    case I_LIST:
-      cip++;
-      if (*cip == I_EOL || *(cip + 3) == I_EOL)
-        ilist();
-      else
-        err = ERR_SYNTAX;
-      break;
-
-    case I_RUN: //I_RUNの場合（RUN命令）
-      cip++; //中間コードポインタを次へ進める
-      irun(); //RUN命令を実行
-      break; //打ち切る
-
-    case I_SAVE://extend
-      cip++;
-      if (*cip == I_BOOT) {
-        cip++;
-        listbuf[SIZE_LIST] = I_BOOT;
-      }
-      else {
-        listbuf[SIZE_LIST] = 0;
-      }
-      if (*cip == I_EOL || *cip == I_STR)
-        //      flash_write(listbuf);
-        isave();
-      else
-        err = ERR_COM;
-      break;
-
-    case I_LOAD://extend
-      cip++;
-      if (*cip == I_EOL || *cip == I_STR)
-        //      flash_read(listbuf);
-        iload();
-      else
-        err = ERR_COM;
-      break;
-
-    default: //どれにも該当しない場合
-      iexe(); //中間コードを実行
-      break; //打ち切る
+void idir() {
+  String fn = "";
+  if (*cip == I_STR)
+  { cip++;
+    int i = *cip++;
+    while (i--) fn += char(*cip++);
   }
-}
-
-// Print OK or error message
-void error() {
-  if (err) { //もし「OK」ではなかったら
-
-    //もしプログラムの実行中なら（cipがリストの中にあり、clpが末尾ではない場合）
-    if (cip >= listbuf && cip < listbuf + SIZE_LIST && *clp)
-    {
-      newline(); //改行
-      c_puts("LINE:"); //「LINE:」を表示
-      putnum(getlineno(clp), 0); //行番号を調べて表示
-      c_putch(' '); //空白を表示
-      putlist(clp + 3); //リストの該当行を表示
+  SPIFFS.begin();
+    Dir dir = SPIFFS.openDir("/");
+  if (fn == "") {
+    while (dir.next()) {
+//      Serial.println(dir.fileName());
+      c_putstr(dir.fileName());
+      newline();
     }
-    else //指示の実行中なら
-    {
-      newline(); //改行
-      c_puts("YOU TYPE: "); //「YOU TYPE:」を表示
-      c_puts(lbuf); //文字列バッファの内容を表示
+  }
+  else //if filename is specified
+  {
+    File f = SPIFFS.open(fn, "r");
+    if (!f)
+      Serial.println("file open failed");
+    else {
+     int fSize = f.size();
+//      Serial.println(dir.fileName() + ":" + String(fSize));
+      c_putstr(dir.fileName() + ":" + String(fSize));
+      newline();
     }
-  } //もし「OK」ではなかったらの末尾
+  }
+    SPIFFS.end();
+  }
 
-  newline(); //改行
-  c_puts(errmsg[err]); //「OK」またはエラーメッセージを表示
-  newline(); //改行
-  err = 0; //エラー番号をクリア
-}
 
-/*
-  TOYOSHIKI Tiny BASIC
-  The BASIC entry point
-*/
 
-void basic() {
-  unsigned char len;
 
-  inew();
-  // newline(); //
-  c_puts("TinyBASIC"); //TOYOSHIKI TINY BASIC
-  newline(); //
-  //  c_puts(STR_EDITION); //
-  //  c_puts(" EDITION"); //
-  // newline(); //
-  //  if (bootflag() == I_BOOT) {
-  //    c_puts("Power on run"); newline();
-  //    //    flash_read(listbuf);
-  //    iload();
-  //    irun();
-  //  }
-  error();
 
-  while (1) {
-    c_putch('>');
-    c_gets();
 
-    len = toktoi();
-    if (err) {
-      error();
-      continue;
+
+  //unsigned char bootflag() {
+  //  EEPROM.begin(SIZE_LIST + 1);
+  //  return EEPROM.read(SIZE_LIST);
+  //}
+  //Command precessor
+  void icom() {
+    cip = ibuf; //中間コードポインタを中間コードバッファの先頭に設定
+
+    switch (*cip) { //中間コードポインタが指し示す中間コードによって分岐
+
+      case I_NEW: //I_NEWの場合（NEW命令）
+        cip++; //中間コードポインタを次へ進める
+        if (*cip == I_EOL) //もし行末だったら
+          inew(); //NEW命令を実行
+        else //行末でなければ
+          err = ERR_SYNTAX; //エラー番号をセット
+        break; //打ち切る
+
+      case I_LIST:
+        cip++;
+        if (*cip == I_EOL || *(cip + 3) == I_EOL)
+          ilist();
+        else
+          err = ERR_SYNTAX;
+        break;
+
+      case I_RUN: //I_RUNの場合（RUN命令）
+        cip++; //中間コードポインタを次へ進める
+        irun(); //RUN命令を実行
+        break; //打ち切る
+
+      case I_SAVE://extend
+        cip++;
+        //      if (*cip == I_BOOT) {
+        //        cip++;
+        //        listbuf[SIZE_LIST] = I_BOOT;
+        //      }
+        //      else {
+        listbuf[SIZE_LIST] = 0;
+        //      }
+        if (*cip == I_EOL || *cip == I_STR)
+          //      flash_write(listbuf);
+          isave();
+        else
+          err = ERR_COM;
+        break;
+
+      case I_LOAD://extend
+        cip++;
+        if (*cip == I_EOL || *cip == I_STR)
+          //      flash_read(listbuf);
+          iload();
+        else
+          err = ERR_COM;
+        break;
+
+      case I_DIR://extend
+        cip++;
+        if (*cip == I_EOL || *cip == I_STR)
+          idir();
+        else
+          err = ERR_COM;
+        break;
+
+      default: //どれにも該当しない場合
+        iexe(); //中間コードを実行
+        break; //打ち切る
     }
+  }
 
-    if (*ibuf == I_NUM) { //
-      *ibuf = len; //
-      inslist(); //
-      if (err) //
-        error(); //
-      continue; //
-    }
-    icom(); //
-    error(); //
+  // Print OK or error message
+  void error() {
+    if (err) { //もし「OK」ではなかったら
 
-  } //無限ループの末尾
-}
+      //もしプログラムの実行中なら（cipがリストの中にあり、clpが末尾ではない場合）
+      if (cip >= listbuf && cip < listbuf + SIZE_LIST && *clp)
+      {
+        newline(); //改行
+        c_puts("LINE:"); //「LINE:」を表示
+        putnum(getlineno(clp), 0); //行番号を調べて表示
+        c_putch(' '); //空白を表示
+        putlist(clp + 3); //リストの該当行を表示
+      }
+      else //指示の実行中なら
+      {
+        newline(); //改行
+        c_puts("YOU TYPE: "); //「YOU TYPE:」を表示
+        c_puts(lbuf); //文字列バッファの内容を表示
+      }
+    } //もし「OK」ではなかったらの末尾
+
+    newline(); //改行
+    c_puts(errmsg[err]); //「OK」またはエラーメッセージを表示
+    newline(); //改行
+    err = 0; //エラー番号をクリア
+  }
+
+  /*
+    TOYOSHIKI Tiny BASIC
+    The BASIC entry point
+  */
+
+  void basic() {
+    unsigned char len;
+
+    inew();
+    // newline(); //
+    c_puts("TinyBASIC"); //TOYOSHIKI TINY BASIC
+    newline(); //
+    //  c_puts(STR_EDITION); //
+    //  c_puts(" EDITION"); //
+    // newline(); //
+    //  if (bootflag() == I_BOOT) {
+    //    c_puts("Power on run"); newline();
+    //    //    flash_read(listbuf);
+    //    iload();
+    //    irun();
+    //  }
+    error();
+
+    while (1) {
+      c_putch('>');
+      c_gets();
+
+      len = toktoi();
+      if (err) {
+        error();
+        continue;
+      }
+
+      if (*ibuf == I_NUM) { //
+        *ibuf = len; //
+        inslist(); //
+        if (err) //
+          error(); //
+        continue; //
+      }
+      icom(); //
+      error(); //
+
+    } //無限ループの末尾
+  }

@@ -1,4 +1,4 @@
-THanks to mister  (robo8080) (https://github.com/robo8080), who published working tiny basic interpreter for ESP8266.
+Thanks to mister  (robo8080) (https://github.com/robo8080), who published working tiny basic interpreter for ESP8266.
 I just include ability to connect PCD8544 and will try to add ps/2  keyboard.
 <pre>
 keywords:
@@ -16,9 +16,9 @@ keywords:
  PRINT
  LET
  @
- RND
- ABS
- SIZE
+ RND()
+ ABS()
+ SIZE()
  LIST
  RUN
  NEW
@@ -27,6 +27,1074 @@ keywords:
  LOAD //extend
 
 integer numbers
-no arrays
+one @ array.
+
+
+================http://tinybc.sourceforge.net/tinybctut.txt============================
+                  Tiny BASIC manual for beginners
+                  -------------------------------
+
+
+Why Tiny BASIC?
+---------------
+
+You don't know anything about programming? OK, no problem, then Tiny
+BASIC for Curses is for you. Yes you can make things to move around on
+screen, yes you can control everything with your keys. But still it
+is primitive, of course everyone who knows that there is more, wants
+more. Nothing more advanced is simple though, or when it is simple then
+it is not complete.
+
+Think that it is how it was, there was such BASIC on old
+microcomputers, and the most important about it was that it was very
+simple. So simple that no programming language can be simpler. You may ask
+how can a programming language with some twenty of pages of programming
+manual be simple. This is how complex programming is. Starting from
+the concepts, what is programming? Programming is a way to model how
+the things happen in nature. And beginning from that it is necessary to
+explain how a programming language enables to do all that.
+
+This manual is a part of the Tiny BASIC for Curses project, the project's
+page in freecode is http://freecode.com/projects/tinybc and the download
+page in SourceForge is http://sourceforge.net/projects/tinybc . Also
+read the manual page http://tinybc.sourceforge.net which you can read in
+Linux with man tinybc if Tiny BASIC for Curses is installed. The online
+version is the latest version of this manual.
+
+
+Starting Tiny BASIC
+-------------------
+
+What do you need for programming in Tiny BASIC for Curses? All you
+need for that is terminal. In Linux it is called terminal or Konsole,
+in Windows it is called cmd, console or command prompt. I assume that you
+have a terminal icon on your desktop, simply run it. I also assume that
+your terminal is configured properly, like the font is large enough,
+there are right colors and right encoding for pseudo graphics (IBM850
+for Linux terminal). This terminal is where all your world will be.
+
+It may sometimes happen that your program remains running in a loop, if
+you did not code it so that you can exit it normally. No problem, ctrl-c
+in Linux and ctrl-break in Windows (hold down ctrl and press the break
+key at the upper right corner of the keyboard) exits the program. But
+if nothing helps, clicking on the x button on the terminal window will
+always close the terminal. So you always remain in control.
+
+All you need to start Tiny BASIC for Curses from command prompt,
+is typing tinybc and pressing Enter. Tiny BASIC for Curses greets
+you and gives you a tinybc prompt. There you can start to enter your
+program. Every line which you write after that prompt followed by Enter,
+which begins with a number and space, is stored as a program line. Usually
+the numbers are increased by 10, because then you can enter new lines
+between any two lines already there. You can enter the lines in any order,
+though mostly you would like to do it in the increasing order.
+
+That all lines have to begin with a number is the peculiarity of Tiny
+BASIC. Writing a number before every line is tedious of course, but it
+has also some benefits for beginners. When every line has a number then
+every line is identified, which makes finding it, remembering it and
+referring to it much easier. Tiny BASIC is designed to be as simple as
+possible, but not efficient and convenient to use.
+
+All commands have to be in upper case, just because this is how it
+once was in that BASIC, and you can write only the first letter of a
+command. If you type L (LIST) after the tinybc prompt and press Enter,
+you will see the program which you entered. When your program is longer
+than the screen, it prints a part of it and stops, press any key after
+that when you want to see the next part. That way you can see all your
+code until the prompt appears. You may also follow L with one or two
+numbers. For example L 100 prints your code starting from the line
+which begins with the number 100, L 100-200 prints all lines of your
+code between 100 and 200.
+
+If you browse your code and decide that some lines must be deleted,
+for deleting a line you simply have to write the number of that line
+after the tinybc prompt, and press Enter. To change a line which is
+already there, you can simply write another line with the same number
+after the tinybc prompt, and press Enter. So that way you can write
+your code and change everything in it whenever you want. Try it out by
+writing whatever text after the line numbers, and then deleting, adding
+and changing the lines. Tiny BASIC for Curses will not complain before
+you run your program.
+
+C (CLEAR) clears the program so that you can write a new one. H (HELP)
+prints help, Q (QUIT) exits tinybc. You can use Backspace to delete
+wrongly written characters, this is the key above Enter with a left
+arrow on it, ctrl-u deletes the whole line.
+
+
+Writing your first program
+--------------------------
+
+Now you know how to enter a program, and you certainly want to know
+what you should write in these lines so that your program would also
+do something. Tiny BASIC for Curses is an interpreter. Interpreter is
+something which executes the program line after line. So as you likely
+already understood, when you run your program, the lines shall be executed
+one after another, in the order of their numbers. So write this program:
+
+10 PRINT "Hello ";
+20 PRINT "World!"
+
+Type L to see that you have only these two lines in your program. To
+run the program, type R followed by Enter. If you wrote the program
+exactly as above, the terminal screen will be cleared and the text
+"Hello world!" will appear at the top of the screen. As you can see,
+this program has only two lines, after executing the last line there is
+nothing more to execute and the program exits. After the program exits,
+the interpreter waits you to press any key, so always remember to press
+any key when the program ends and you want to return to the prompt. Thus
+after pressing any key, the terminal screen will be cleared and you will
+see the tinybc prompt again.
+
+Now you have written your first program and run it. The line which
+starts with a number is called statement, and there are different kind of
+statements. What the PRINT statement does is that it prints everything
+which follows it, as you could guess. The text which you want to print
+always has to be between quotation marks, this text is called string.
+
+Thus far it is simple. But why is there semicolon at the end of the
+first statement? You can write several strings in one statement, and
+you must separate them either by comma or by semicolon. Comma means
+that the next string shall be printed after the previous one with a
+space between the strings, semicolon means the same except that there
+shall be no space between the strings. So semicolon in the end of the
+PRINT statement means that anything which will be printed later, shall
+be printed immediately after the text written by that statement, without
+going to the next line. If the PRINT statement does not end with comma
+or semicolon, any text printed after that statement shall be printed
+starting from the beginning of the next line on the screen.
+
+
+Jumping to other places in the program
+--------------------------------------
+
+So as you now know, the statements in the program are executed one
+after another. This is a simplification, computers are made to implement
+mostly pre-programmed tasks, and thus blocks of code are executed
+sequentially. What programming should enable us to do, is modeling the
+causal links in nature where one event causes other events to happen. That
+simplification still enables us to do that when we can execute a block of
+code after a block of code which does not immediately precede it. The ways
+to do that are conditional statements, subroutines and the GOTO statement.
+
+The GOTO statement is simple, it is just GOTO followed by space and
+a line number. This line number is the number of the line which will
+be executed after the GOTO statement. So after that statement the
+interpreter starts to execute statements starting from the statement
+with that number, in increasing order as usual, until there would be
+another GOTO statement. Consider the following code:
+
+10 PRINT "Hello World!"
+20 GOTO 10
+
+This code shall cause a problem in that it never stops. So you can
+see that there can be programs which work forever, unless stopped by
+some means. You may think whether you actually run that program, but you
+had to see it to have some idea. If you are courageous and still run that
+program, what you will see is a screen where "Hello World!" is printed
+on every line. This is because the program printed a screenful of these
+texts so quickly that you did not see how it happened, and after that
+it continues to print that text on the last line. After printing on the
+last line of the screen, all that is on the screen moves up by one line,
+so that new text can be written on the last line.
+
+So you now know one of the most powerful statements called GOTO. The
+way GOTO was used in the example above was not a good use though. Because
+GOTO is a very powerful statement, one should be careful to use it only
+in the correct way. What you saw in the program above is called loop, but
+it was not a correctly written loop. In some other programming languages
+there are loops like for and while loops, if blocks and statements like
+break and continue, but no GOTO statement. The standard Tiny BASIC has
+no such loops and statements, so later it would be explained how to
+write these loops and statements with GOTO, and how to use GOTO correctly.
+
+
+Variables, the places to store data
+-----------------------------------
+
+So now you know how the program statements are executed. Next you
+should know something equally important, the variables. Variables
+are places of data storage where numbers can be stored. Numbers can
+be both positive and negative. The letters A to Z denote 26 of such
+storage places. And since all the memory space which is left after your
+program is used for data storage, the rest of these storage places can
+be accessed using @(n). There n is the number of the storage place, also
+called index, and @ is the symbol of the array. Thus a lot of numbers
+can be stored, and that way any data, as you soon will see. Write and
+run the following program:
+
+10 A = 2
+20 B = 3
+30 @(0) = 4
+40 C = A + B * @(0)
+50 PRINT "C =", C
+
+As you could guess, PRINT statement there prints the value of the
+variable C, which is a number, after the text "C =". So there can
+be both strings and numbers in the PRINT statement, separated by commas
+or semicolons.
+
+The statements there which contain = are called LET statements. After
+= in the LET statement there is expression. Expression there is like a
+mathematical expression where the operators +. -, *. / and the function
+RND(n) can be used. These operators stand for add, subtract, multiply
+and divide, and RND(n) provides a random number 0 to one less than n.
+Instead of n there can be any expression, like RND(A + B + 1). The same
+is true about array index, like @(B + 1). Parentheses can be used the
+same way as in mathematical expressions, to change the order of the
+mathematical operations. Before = in the LET statement there is lvalue,
+a variable or array element to which the expression which follows the =
+shall be assigned.
+
+So what result shall the PRINT statement print in the example
+above? The right answer is 14, because the expression is evaluated in
+the correct order of mathematical operations, where the multiplication
+and division is done before addition and subtraction. Thus 3 multiplied
+by 4 equals 12, and 2 plus 12 equals 14. If the calculations were done
+in the order in which the operations occur, the answer were 20.
+
+You can safely consider that when your program starts, the values of
+all variables and array elements are 0. So now you know what variables
+are and what to do with them. Next you would know more about expressions
+and array.
+
+
+More about expressions
+----------------------
+
+There is more to expression than the four operators. Also the
+relational operators <, <=, >, >=, = and <>, standing for less than,
+less than or equal, greater than, greater than or equal, equal to, and
+not equal to, can be used in expression. So how can these operators
+be used together with other operators? The answer is that it is all
+about the precedence of operators, that is, what operations shall be
+performed first, what next, etc. The relational operations have the lowest
+precedence, which means that they shall be performed last. The value of
+the relational operations is 1 or 0 depending on whether the condition
+which the relational operator represents, is true or not. Consider
+the following:
+
+10 A = 3
+20 B = A - 3 > 0
+
+The value of B shall be 0 because A - 3 equals 0, and this shall be
+evaluated first. 0 is not greater than 0, so the result of the relational
+operation is 0. But even more complex calculations can be done with
+relational operators, considering that parts of the expression can be
+enclosed in parentheses. Consider the following:
+
+10 A = 3
+20 B = (A > 2) * (A < 4)
+
+The result is 1. The parts of the expression in parentheses shall
+be evaluated first. The value of both expressions in parentheses is
+1, because 3 > 2 and 3 < 4. When both operations in parentheses are
+relational operations, the values of both of them can only be 0 or
+1. Thus the multiplication there means that the result is 1 only if the
+values of both relational operations are 1. This is just another way to
+say that the expression is true if both relational operations are true,
+which is the same as logical and.
+
+You can also use + for a similar purpose, the result is 0 only when both
+relational operations are false, otherwise the result is not 0. This is
+another way to say that the expression is true if the value of at least
+one relational operation is true, which is the same as logical or.
+
+
+More about array
+----------------
+
+Now more about array. Many expressions can be assigned to array in
+one LET statement. Consider the following:
+
+10 A = 3
+20 @(7) = 2, 3, A - 4, -6
+
+The numbers 2, 3, -1 and -6 shall be assigned to array elements
+starting from the element 7, thus to array elements @(7), @(8), @(9)
+and @(10).
+
+And this is not all. In assignment to array, in the comma separated list
+which follows =, there can also be strings. Consider the following:
+
+10 @(5) = 2, "abc", -6
+
+There, to the array element 5 shall be assigned number 2, but to the
+array elements 6, 7 and 8 shall be assigned the codes of the letters a,
+b and c, correspondingly. To the array element 9 shall be assigned number
+-6. So letters are numbers too, each letter has its number in the code
+table. Search google for ASCII and for IBM850 and you would see what
+number corresponds to each character.
+
+So why is all that necessary? Later you would see that assigning
+strings to array is necessary for processing text, because that way text
+becomes data the same as numbers, thus it can be processed the same way as
+any other data. In several programming languages text is stored in arrays.
+
+Assigning many expressions and strings to array at once is useful also
+for data driven code. Data driven code means that what your code does is
+determined by the data, and you assign that data to the array once. This
+is equivalent to the initialization of arrays in other programming
+languages such as python. Code thus may become short, simple and flexible,
+and you can change a lot by changing data only.
+
+
+Conditional statement
+---------------------
+
+So now you know some statements and you know some variables. There is
+one powerful statement which you still have to know to write your first
+programs which can do something useful. And this is the conditional
+statement called IF statement. The form of the IF statement is IF
+expression statement. The expression there is any expression described
+above, and statement is any statement without a preceding number.
+When the value of the expression is anything different from zero, the
+statement shall be executed the way such statement shall normally be
+executed. When the value of the expression is zero, the statement shall
+not be executed. Write and run the following program:
+
+10 A = 3
+20 B = -2
+30 IF A > -1 PRINT "A is a positive number"
+40 IF B > -1 PRINT "B is a positive number"
+
+The text "A is a positive number" shall be printed, but the next
+text shall not be printed, because in case of B the condition is not true.
+
+Conditional statement is another way to implement the causal links,
+by associating the aspects of code. Many things are mostly going on
+in parallel, and it is often not possible to process them in separate
+parts of the program. So processing them is scattered everywhere in the
+program, and if blocks take care of it. The number of such associations
+determines the complexity of code. Later it would be explained how to
+write if blocks.
+
+
+Adding comments to program
+--------------------------
+
+Now one more statement which is very simple, it is called REM
+statement. This statement is simple because it does nothing. Consider
+the following:
+
+10 REM DO
+20 PRINT "Hello World!"
+30 GOTO 10
+
+This works exactly the same as the previous example of a loop. The
+first statement does nothing and thus every time only the string is
+printed. Yet it is slightly better than the previous loop example. Because
+it is good to always mark the targets of GOTO with REM statements, which
+describe the reason of the jump. In this case the reason is loop, thus the
+REM statement marks the beginning of the loop. Adding REM statements is
+tedious, but there is a lot of benefit of it, because in a big program
+it is difficult to see what all these GOTO-s do. But when the targets
+are marked like that, it would be easy to see a part of what construct
+any GOTO statement really is. How to use GOTO statements will later be
+explained more thoroughly.
+
+The text after REM is not processed by the interpreter at all, thus
+it can be whatever. REM statements without any text can be used to add
+empty lines. Add empty lines between subroutines and between bigger
+parts of the code, to make the code clearer.
+
+REM statements are also often used to describe what one or another part of
+the program does (called comments), which is also very important. Comments
+are mostly written before the blocks and sometimes before statements, to
+describe what they do. You yourself would forget quickly what different
+parts of your program do, and one day you may look at your own code as
+to something written in some unknown language. But do not write too many
+comments, because then it would be difficult to read the code.
+
+
+Loops
+-----
+
+Now more about loops, how to write loops which are not endless. Write
+the following program and run it:
+
+10 I = 1
+20 REM DO
+30 IF I > 10 GOTO 70
+40 PRINT I
+50 I = I + 1
+60 GOTO 20
+70 REM LOOP
+
+This shall print numbers 1 to 10. The loop is between REM DO and
+REM LOOP. Adding these statements to the loop makes the code longer,
+but it is very important to always do that, so that it would be easy to
+see where the loops begin and end. Clarity of the code is more important
+than the length of the code.
+
+The statements 30 and 60 form what is called while loop in other
+programming languages, except that the condition I > 10 is inverse, in
+while loop that condition has to be I <= 10. The condition means that
+when I becomes greater than 10, the loop ends.
+
+The statements 30 and 60 together with the statements 10 and 50
+form the for in range loop in python. The for in range loop has a loop
+variable, in this case I, provides its initial value, in this case 1,
+its final value, in this case 10 in the condition, and the step, which
+is the number by which the loop variable shall be incremented in each
+iteration. In this case the statement 50 provides the increment, and
+the step is 1. In python the for in range loop is one statement and the
+rest of the loop follows with an indentation, but it works exactly as
+the loop in this example. Now write the following program and run it:
+
+10 REM DO
+20 I = I + 1
+30 PRINT I
+40 IF I = 10 GOTO 60
+50 GOTO 10
+60 REM LOOP
+
+This does exactly the same as the previous example, only in a slightly
+different way. I is not initialized, so its value in the beginning of
+the program is 0. GOTO in the statement 40 is equivalent to the break
+statement. We can also say that the statement 50 is equivalent to the
+continue statement, though in other programming languages this jump is
+provided by the loop.
+
+The loops in this and in the previous example are used for different
+purposes, the difference is that when I is out of range, the loop in
+this example iterates one time, and the loop in the previous example
+does not iterate at all. In other programming languages, such as python,
+there is no GOTO statement, so you have to write loops using only the
+loop statements, the continue statement and the break statement. But
+you should now know what these statements do, so switching to another
+programming language should not be difficult.
+
+Loop is a special case of a causal link, a block which can execute
+itself as next block, loops also occur often in nature. It is correct
+to jump only to the beginning of it or to the end of it, only from
+inside of the block and not from inside a contained block. Loop can
+be inside of another loop. The main idea of structured programming is
+really simple, the whole program consists of blocks, which provides a
+clear structure. The blocks are loops, if-else blocks and subroutines.
+
+
+If-else blocks
+--------------
+
+Where you also have to use GOTO statements, is in if-else blocks. These
+blocks are also provided by other programming languages, but there you
+have to implement them without GOTO, so it is important to know how they
+work. Write the following program and run it:
+
+10 N = RND(2) + 1
+20 PRINT N
+30 IF N <> 1 GOTO 60
+40 PRINT "one"
+50 GOTO 80
+60 REM ELSE
+70 PRINT "two"
+80 REM END IF
+
+Using if and else together is necessary to do either one or the other,
+but not both. The IF condition used in the example above is inverse of the
+if condition used in other programming languages for doing the same. As
+you can see, if the condition is true, we jump to the else block, but
+if it is not true, we enter the if block and in the end of it jump to
+the end of the two blocks.
+
+If-else blocks can be inside other if-else blocks. It is also possible
+to use multiple else blocks, which does almost the same as the switch
+statement in some programming languages. Write the following program
+and run it:
+
+10 N = RND(3) + 1
+20 PRINT N
+30 IF N <> 1 GOTO 60
+40 PRINT "one"
+50 GOTO 120
+60 REM ELSE
+70 IF N <> 2 GOTO 100
+80 PRINT "two"
+90 GOTO 120
+100 REM ELSE
+110 PRINT "three"
+120 REM END IF
+
+The benefit of such chain of else blocks is that when the necessary
+operation is done, like in statement 40, a jump is made to the end of
+all blocks and no other IF statement is executed. Basically, if-else
+block is like several blocks inside a containing block, and jump can be
+made from the end of these blocks to the end of the containing block.
+
+In some cases it may be necessary to use flags, variables which value
+can only be 0 or 1. Set a flag when an operation is done, and later use
+that flag in IF conditions.
+
+All the correct uses of the GOTO statement were described above,
+and you should never use GOTO statement for any other purposes, for your
+code to be clear and consistent.
+
+
+Game loop
+---------
+
+In addition to loops you should know how the modeless programs, such
+as games, are generally written. In such programs there is often one
+big loop, which is called game loop. The game loop is an endless loop
+which exits only when the user wants to exit. Every iteration of the
+game loop usually checks the user input, does the necessary processing,
+and then draws the next screenful of graphics, which is called frame.
+
+In the beginning of the game loop there must be a statement named
+NAP. NAP is followed by the number of milliseconds, this is the number
+of milliseconds during which the program does nothing. Providing
+this inactivity period once in every iteration is necessary for two
+reasons. First it gives the operating system a time to do other things
+than running your program. Not giving that time takes too much computer
+resources, and some operating systems such as Windows would become not
+responsive when no such time is given. Second, it can be used to adjust
+the speed of the game or other program.
+
+For fast output, write the whole screen without line feeds, but
+in that case anything which you wrote shall appear on the screen only
+after input statements or NAP statement. It is common in programs such
+as text editors to rewrite the entire screen after inserting every single
+character. For the maximum output speed, in output statements the screen
+is only refreshed when printing a line feed.
+
+If it happens that the output becomes crappy, you may also have
+to use NAP statement before PRINT or OUT statements. This should not
+happen but it depends on your terminal. In some terminals the output to
+the terminal is not synchronized, and thus long printing operations may
+continue when the program already has to print something else.
+
+
+Input and output
+----------------
+
+Now you know so much about writing programs that you likely want to
+write some interactive program. There are several statements for input
+and output in Tiny BASIC for Curses. The most straightforward of these
+is the INPUT statement. Write the following program and run it:
+
+10 PRINT "A, B",
+20 INPUT A, B
+30 PRINT "A =", A, "B =", B
+
+The program asks "A, B ?", after which you should write two numbers
+separated by either comma or space, and then press Enter. The numbers
+which you entered shall be assigned to variables A and B, and then
+the values of these variables shall be printed. You may also enter an
+upper-case letter instead of a number, in that case the entered value
+shall be the value of the variable which corresponds to that letter. If
+you do not enter any number, the value of the input variable shall not
+change, and thus shall not be 0 unless you assign it so.
+
+INPUT is convenient but rather restricted. Therefore Tiny BASIC
+for Curses provides two more general statements for input and output,
+INKEY and OUT. Write the following program and run it:
+
+10 PRINT "Please enter your name"
+20 REM DO
+30 NAP 10
+40 INKEY K
+50 IF (K = 10) + (I > 40) GOTO 100
+60 IF (K < 32) + (K > 126) GOTO 20
+70 @(I) = K
+80 I = I + 1
+90 GOTO 20
+100 REM LOOP
+110 PRINT "Your name is",
+120 REM DO
+130 IF @(J) = 0 GOTO 170
+140 OUT @(J)
+150 J = J + 1
+160 GOTO 120
+170 REM LOOP
+
+The program asks your name, you write your name followed by Enter,
+and the program prints your name. As you can see, in the beginning there
+is a loop for inputting the name. The loop sleeps for 10 milliseconds to
+not read the key code too often, then writes the key code to the variable
+K. The loop ends when the key was Enter. We also check the boundary of
+the text. If K is not a letter, we go to the next iteration and skip
+the rest of the loop. Then K shall be assigned to the element of the
+array with the current index, and the index I shall be incremented. The
+variables I and J are mostly used as array indexes.
+
+After the name is stored to the array, the program prints "Your name
+is" and starts to print the name letter by letter. As you may notice,
+the loop for that is a while loop, because it may happen that no letters
+were entered and nothing shall be done then. The letters shall be printed
+using the OUT statement, which writes a character to the screen, until
+the first array element which is 0. This is how we find the end of the
+text, because no letter code is 0.
+
+OUT can output every character, including the pseudo graphics
+characters. In IBM850 code page there are characters for a large rectangle
+(219), lower square (220) and upper square (223), these characters enable
+to draw pseudo graphics very similar to the "graphics" which some old
+microcomputers had. There are also other pseudo graphics characters
+in the IBM850 code page, such as characters for drawing boxes and
+rectangular diagrams.
+
+
+Subroutines, using the same code many times
+-------------------------------------------
+
+Now you may feel that you can write every kind of programs, but
+this is not yet all about programming. If you have to do the same thing
+several times in different places of the program, don't you think that
+it is better to write that piece of code once and then use it every time
+with different data? You may think that you will use GOTO to go to that
+piece of code every time, but the problem is how can you come back from
+there. It is true that variable can be used after GOTO, so that problem
+can be solved, but this is not a good way to do it.
+
+For that purpose there are subroutines, which in other programming
+languages such as python are called functions. For jumping to a subroutine
+there is GOSUB statement with a line number after GOSUB. This is named
+calling a subroutine. You can use GOSUB instead of GOTO to go to your
+repeatedly used piece of code. How it differs from GOTO is that the line
+from which the subroutine was called, is remembered. And there is the
+statement RETURN which jumps back to the line next to the GOSUB statement
+of the last subroutine call. You can see how that works in the following
+example. Write the following program and run it:
+
+10 N = 10
+20 @(N) = "Hello World!"
+30 C = N
+40 GOSUB 1000
+50 @(N) = "Hello tinybc"
+60 C = N
+70 GOSUB 1000
+80 END
+1000 REM SUBROUTINE
+1010 REM DO
+1020 IF @(C) = 0 GOTO 1060
+1030 OUT @(C)
+1040 C = C + 1
+1050 GOTO 1010
+1060 REM LOOP
+1070 PRINT
+1080 RETURN
+
+This program has a subroutine which prints the sequence of characters
+stored in the array, starting from one particular element. The subroutine
+starts from the line 1000, and the start of the subroutine is marked
+with REM SUBROUTINE. It starts from the line 1000 simply because it is
+easier then to change the main program and the subroutine separately,
+this of course changes when you renumber the whole program.
+
+The main program starts by assigning 10 to N. 10 is the index of the
+array element from which the text starts, and this number is always the
+same, such number is called constant. We could as well write 10 instead
+of N everywhere, but it is a good practice not to use "magic numbers"
+in the code. At least when some number is used several times, it is a
+good practice to assign that number to a variable, and then use that
+variable instead. This also makes the code much more flexible, like
+if we want to write texts starting from the element 100 instead of 10,
+all we have to do is to change that number in one place.
+
+The main program writes two texts using the same subroutine. You can
+see how convenient it is, now every time when we need to print a text
+from the array, we only need to call that subroutine.
+
+Before calling the subroutine, N is assigned to variable C. Why we
+have to do it is that in Tiny BASIC there are no local variables. Local
+variables are like a separate set of variables used in the subroutine or
+function only, so that changing these variables do not change the same
+variables in the main program. So certain variables should be used in
+the subroutines which are never used in the main program. Assigning N
+to C is like passing arguments to the subroutine, arguments are the only
+variables the subroutine uses from outside of it, and the only argument
+in our case is N.
+
+In more complex cases, other ways can be used to pass arguments to a
+subroutine and get the results from a subroutine, like the first elements
+of the array can be used for that. In even more complex cases it is even
+possible to simulate local variables by storing some global variables
+in the array in the beginning of the subroutine, and retrieving them
+from there before returning from the subroutine.
+
+As you can see, the main program ends with the END statement. Running
+the program ends after the last statement of it (other than GOTO)
+is executed. But in this example there is a subroutine after the last
+statement of the main program. So we used END statement which can exit
+the program anywhere in the program.
+
+The subroutine outputs the characters in the array, until the array
+element which is 0. The PRINT statement only makes the cursor to go
+to the next line. As you can see, the subroutine ends with the RETURN
+statement, which jumps back to the line 50 or to the line 80, depending
+on where the subroutine was called.
+
+Other subroutines can be called inside a subroutine, but it is not
+correct to write a subroutine inside another subroutine.
+
+
+Developing and debugging programs
+---------------------------------
+
+Now you know enough to write many kind of programs. So you should
+know more about how to develop and debug the programs.
+
+Tiny BASIC for Curses shows errors only when it runs the program. After
+finding an error, the program exits. Error messages are printed by the
+tokenizer, except the messages about the GOSUB stack. These messages mean
+that something is wrong and either too many GOSUB or RETURN statements
+were executed. The number of the program line where the error occurred,
+is written in every error message, so that you can browse your program
+again and find out why the error occurred on that line. It may be just
+because you made a simple writing error.
+
+"Statement not implemented" means that something is wrong with
+the first word of the statement. "Token type not what was expected",
+followed by the wrong token, means that some other word or operator is
+not what it had to be. What you should avoid is dividing by zero, because
+the program shall be exited then by the system (called "crash"),
+and you cannot see where it happened. The token types are the following:
+
+1  -- *		11 -- >		21 -- <		31 -- RND
+2  -- @		12 -- IF	22 -- -		32 -- )
+3  -- CLS	13 -- INCHAR	23 -- NAP	33 -- ;
+4  -- COLOR	14 -- INKEY	24 -- <>	34 -- SIZE
+5  -- ,		15 -- INPUT	25 -- Number	35 -- /
+6  -- END	16 -- <=	26 -- OUT	36 -- "
+7  -- =		17 -- LET	27 -- +		37 -- THEN
+8  -- >=	18 -- Line end	28 -- PRINT	38 -- Variable
+9  -- GOSUB	19 -- LOCATE	29 -- REM       39 -- SYSTEM
+10 -- GOTO	20 -- (		30 -- RETURN
+
+All people inevitably make mistakes, especially when they make
+something so complex as programs. The brain works differently from
+conventional machines, it associates things, thus doing things in certain
+sequence or order is not natural for the brain, and it cannot for example
+follow a code as faultlessly as an interpreter can do it.
+
+When your program does something different from what you expect, do not
+guess what it could be, but start to debug the program. Guessing makes
+you to think about many possibilities, and the number of possibilities
+may be huge in programming. Thus trying to fix something in the code
+by guessing is extremely inefficient. And the greatest peculiarity of
+software compared to other kind of technology, is that one cannot see
+what happens when it works.
+
+To overcome that invisibility, that which happens has to be made
+visible. The way to make it visible is adding the so-called debug code
+to your program. Debug code is a temporary code which you insert between
+the statements. You may separate it by comments, like REM DEBUG BEGIN
+and REM DEBUG END, so that you can later easily remove it. This is
+not necessary when your debug code consists only of PRINT statement,
+and there is some text which you always print in debug messages.
+
+Most importantly the debug code prints the values of some variables.
+Most often it is enough to just print "here", to see whether a certain
+place in the code was reached or not. Debug code can be used for much
+more though, you can use the power of the computer against the computer,
+like by analyzing data in every step. You can also use debug code to
+emulate a part of the code which you have not written yet.
+
+
+Color codes and key codes
+-------------------------
+
+The codes below are the same in Windows and Linux. The color codes
+are the following:
+
+0 -- black,
+1 -- red,
+2 -- green,
+3 -- yellow,
+4 -- blue,
+5 -- magenta,
+6 -- cyan,
+7 -- white.
+
+In order not to add large key code tables to the manual for beginners,
+the most important input key codes are written below. The input key
+codes are the following:
+
+10 -- Enter,
+27 -- Escape,
+32 -- Space,
+258 -- down arrow,
+259 -- up arrow,
+260 -- left arrow,
+261 -- right arrow,
+262 -- Home,
+338 -- Page Down,
+339 -- Page Up.
+
+
+Screen-oriented programs
+------------------------
+
+So far you wrote programs which worked in line mode. This is what one
+always learns first in the programming, but it might be a bit boring. Now
+it is a time to do something more fun. Use the character screen, let's
+bring in the colors and make things to move on the screen.
+
+There are four additional statements for character screen. COLOR
+foreground_color, background_color sets the foreground and
+background colors for anything printed on the screen after that
+statement. Foreground_color and background_color are both the color codes
+described above. CLS clears the screen, at that the color of the screen
+shall be the background color set by the previous COLOR statement.
+
+LOCATE line_number, column_number moves cursor to the line and
+column on the screen set by line_number and column_number. The line and
+column numbers start from zero and are counted top to bottom and left
+to right. Cursor is the location on the screen where the next PRINT or
+OUT statement prints. Printing changes the cursor location to the right
+of the printed text. There shall be no error when printing outside the
+screen, but curses then prints at the beginning of the screen instead
+of the desired location.
+
+There is one more character screen statement which is not often used,
+but which is still important. INCHAR variable assigns the code of the
+the character at the cursor location to the variable. This is important
+for example when a certain pattern of characters forms the background,
+and we want to make something to move or change on that background. In
+that case before printing any character to the screen, we can store the
+character which is at the location where we want to print, to a variable
+or to array. INCHAR var1, var2, var3 also assigns the foreground and
+background colors to the variables var2 and var3.
+
+When doing so, we can later remove that which we printed, by restoring
+the characters. After that we can print again to a new location, which
+gives an impression of something moving on the background or something
+temporarily written to the background. The sprites moving on the screen
+in games and windows in user interfaces are examples of using that
+method. Without INCHAR the whole screen had to be stored somewhere,
+which would make such processing unnecessarily too complicated.
+
+Now try to control something on the character screen with keyboard. Write
+the following program and run it:
+
+10 COLOR 7, 4
+20 CLS
+30 REM DO
+40 NAP 10
+50 INKEY K
+60 IF K = 27 END
+70 IF K = -1 GOTO 30
+80 LOCATE I, J
+90 COLOR 7, 4
+100 PRINT "            ";
+110 IF (K = 258) * (I < 24) I = I + 1
+120 IF (K = 259) * (I > 0) I = I - 1
+130 IF (K = 260) * (J > 0) J = J - 1
+140 IF (K = 261) * (J < 65) J = J + 1
+150 LOCATE I, J
+160 COLOR 7, 6
+170 PRINT "Hello World!";
+180 GOTO 30
+190 REM LOOP
+
+First you see nothing, but when you press arrow keys, you can move
+the text "Hello World!" around the screen, Escape key exits the
+program. Press Escape twice because the interpreter waits for one
+more key. As you can see, most of the program consists of an endless
+loop. This loop is similar to the loop in the previous example where
+characters were inputted to array. When the key is the Escape key, the
+program exits. What follows is a continue statement with the condition
+that no key was pressed. Then an empty text is printed to the location I,
+J with the background color, this deletes the previous text.
+
+Then the indexes of row and column, I and J, are changed if the arrow
+keys were pressed. Notice that the boundaries are checked, so that the
+text cannot be moved outside the screen. Always remember to check the
+boundaries also when you process text or other data in array. After I and
+J are calculated, the location is changed to I, J, and the text "Hello
+World!" is printed to the new location with the text background color.
+
+Now you know how to write any kind of screen-oriented
+programs. Graphics is in many ways similar, so if you know how to write
+screen-oriented programs, you also know several things necessary for
+writing graphics programs.
+
+
+Executing external commands
+---------------------------
+
+There is a whole world out there, there are files, there is Internet,
+and you likely want to communicate with all that. It is not what the
+programming language for beginners should provide, but it was a request
+by users to provide such feature, and developers serve the users.
+
+Yet the users should use that feature at their own risk, as it is very
+powerful. It even enables to use Tiny BASIC for Curses for scripting,
+another question is whether it is the best for that purpose. You cannot
+go over the array boundaries, but you may accidentally overwrite that
+which you already have in the array.
+
+The statement for that is SYSTEM expr1, expr2 . The first expression
+is the beginning of the external command in the array, and the second
+is the beginning of the text in the array, both have to be followed by
+zero. You have written commands in the terminal or console, such as ls,
+dir, etc, and executing programs from the command line. External command
+there is the text of such command line. The input of the command is
+taken from the text in the array, and the output of the command shall
+be written to the array, ending with zero and replacing the previous
+text. This method is called filtering though external command.
+
+You can do with external commands a lot which the operating system
+enables to do, but there are some restrictions. This is because a separate
+shell shall be created when executing an external command. For example
+if you change the directory with the SYSTEM statement, this only changes
+the directory in that new shell, and not in the shell where your program
+runs. Thus you are still in the same directory when you run the next
+SYSTEM statement.
+
+Because the interpreter is expected to run on multiple platforms,
+the implementation of executing external commands is the most simple,
+and such that it can work with different shells. For example many shells
+allow to enclose the command line in parentheses, you may have to do
+that to make sure that the input is directed to the first command in
+the chain of commands connected with pipes.
+
+There is a large number of shell utilities in Linux and not many in
+Windows, install GnuWin32 in Windows to get them all. The shell utilities
+tee and cat are also included in tinybc. The command tee takes the
+standard input and writes it to file, and cat does the opposite, reads
+a file and writes it to the standard output. Consider the following code:
+
+10 C = 100
+20 @(0) = "tee myfile.txt", 0
+30 @(C) = "copy", 10, "del", 10, "dir", 10, "time", 0
+40 SYSTEM 0, C
+50 @(0) = "cat myfile.txt", 0
+60 SYSTEM 0, C
+
+This code writes the text in the array starting at C, to the file
+myfile.txt, and then reads the file myfile.txt and writes it to the
+array, also starting at C. So the text in the array remains the same,
+and shall also be written to the file myfile.txt. The list of Windows
+commands there is separated by line feeds (the equivalents in Linux are
+cp, rm, ls and date). The command "tee -a myfile.txt" adds the text to
+the end of the file. Write the following program and run it:
+
+10 C = 100
+20 @(0) = "date", 0
+30 SYSTEM 0, C
+40 GOSUB 1000
+50 END
+1000 REM SUBROUTINE
+1010 REM DO
+1020 IF @(C) = 0 GOTO 1060
+1030 OUT @(C)
+1040 C = C + 1
+1050 GOTO 1010
+1060 REM LOOP
+1070 RETURN
+
+As you can see, the subroutine for printing is almost the same as in
+previous examples. This program prints the current date. But that date
+is the output of the external command named date, which you can also
+write in the terminal or console after the command prompt.
+
+
+Loading, saving and renumbering programs
+----------------------------------------
+
+Finally more about what you can do at the command prompt. By now you
+only wrote test programs and then deleted them again. Well, you could
+also paste the code to tinybc prompt by right clicking the mouse on the
+terminal. But you certainly want to store some of your programs somewhere,
+so that you can later load them again.
+
+For storing files you should exit tinybc, and in the terminal go to
+the directory where you want to store your files (current directory),
+using the command cd directory_name. In Linux terminal you only have to
+write the first letters of the directory name and press TAB, this fills
+in the rest if the directory exists. In Windows Explorer, holding down
+shift key when right clicking on the directory, enables to open console
+with that directory as current. Then start tinybc and enter your program.
+
+Programs are stored in files, which usually have the .bas extension to
+distinguish them from other files. The commands SAVE and LOAD are for
+saving and loading. To save your program, type S filename and press
+Enter. Filename is the name of your program. You can also save your
+programs to other directory than current, and also load them from there,
+if you write path as the file name, such as tests/myprogram.bas . By
+using absolute path which starts with / (\ in Windows) you can also
+save to or load from the directories other than these below the current
+directory. L filename loads the program, remember that this deletes your
+current program.
+
+It is also possible to run programs directly from file when you are
+in terminal, tinybc filename does that. This means that you can also
+edit your program in file. It is the best to edit programs with gvim
+in Linux and with Wordpad in Windows, do not use a word processor such
+as Word or AbiWord for that. You can also start tinybc and load your
+program at once, tinybc -i filename does that.
+
+And finally something which you most likely want to know, tinybc
+-number filename renumbers your program. For example tinybc -100
+myprogram.bas renumbers the program myprogram.bas so that the number of
+the first line shall be 100. Number there is the number which you want
+the first line to have, line numbers shall be incremented by 10. When
+the expression is anything other than a number after GOTO, renumbering
+shall not change that expression, so the expression may become wrong.
+
+
+That's all folks
+----------------
+
+And this is all. You can never read these words in the end of other
+programming manuals, they all say that you should also learn many more
+things by yourself, thus none of them is complete. This programming
+manual is exceptional in that it explains everything which you need
+to know for programming in Tiny BASIC for Curses. I also believe that
+you would not have to forget much if you will one day not use that
+programming language any more, because it is minimal and so general
+that most of what you learned would be useful for you no matter what
+you would later use for programming.
+
+But if you one day know all that well, you should go ahead, and likely
+the best is to learn python. Python is much more complicated than Tiny
+BASIC, especially if you want to use some graphics. But there is nothing
+very simple in real graphics, and graphics alone is not yet enough. For
+example pygame is likely the best if you want to make games, as it is
+made by programmers who had a lot of experience in game programming,
+and they knew what is really necessary for making games. But I believe
+that minimalism enables creativity, so I hope that you also have fun
+with Tiny BASIC for Curses!
+
+
+APPENDIX
+--------
+
+There are ten demos and games in the tinybc package (in the directory
+/usr/share/doc/tinybc when installed in Linux). Only the classic BASIC
+games were ported, because classic games provide the basics.
+
+circles.bas shows how to draw circles using an algorithm derived from
+the Bresenham's algorithm.
+
+colors.bas shows the colors.
+
+euphoria.bas shows that the programs written in the Tom Pittman's
+Tiny BASIC run without changes, it is a verbatim copy of such program.
+
+gunner.bas is a port of the old game named Gunner, it calculates sine
+and cosine using the Ptolemy's method.
+
+lunar.bas is a port of the old game named Lunar Lander, it calculates
+square root using the Babylonian method.
+
+plot.bas is a port of the classic demo 3D Plot, it calculates both
+sine and square root.
+
+sine.bas is a port of the classic David Ahl demo, it calculates sine.
+
+stars.bas is a version of the game which was played on the first
+microcomputers, using only the lights and switches on the front panel.
+
+startrek.bas is a port of the old game Star Trek, it shows many things
+which you would need for writing bigger programs, like in the early 3D
+games they used ray casting similar to the warp engine there.
+
+trident.bas is a 3D rendering example.
+
+
 </pre>
 
