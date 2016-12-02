@@ -1,12 +1,50 @@
 // Terminal control
 #include <PCD85448266.h>
 
+#include <Ticker.h>
+
+Ticker timer;
+
+char inkey=0;
+
+uint32_t timer1_counter=0;
+
 #define LCD_W 14
 #define LCD_H 6
 PCD8544 lcd;
 int lcdX = 0;
 int lcdY = LCD_H-1; // start from the bottom line. Then - scrollUp
 char screen[LCD_H][LCD_W];
+
+void host_display_init()
+{
+  lcd.begin(84, 48);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.setContrast(90);
+}
+
+void timerIsr()
+{
+  ESP.wdtFeed();
+  timer1_counter++;
+  delay(0);
+}
+
+void initTimer() {
+    noInterrupts();           // disable all interrupts
+    ESP.wdtDisable();
+    timer.attach(1, timerIsr);
+    interrupts();             // enable all interrupts
+    ESP.wdtEnable(1000);
+}
+
+void host_init()
+{
+  initTimer();
+  host_display_init();
+
+}
 
 void host_outchar(char c)
 {
@@ -65,14 +103,6 @@ void host_display_write(char c)
  //     Serial.println("CR ("+String(lcdX)+","+String(lcdY)+")");
   }//CR - first position of current line
   lcd.setCursor(lcdX, lcdY);
-}
-
-void host_display_init()
-{
-  lcd.begin(84, 48);
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.setContrast(90);
 }
 
 void host_display_cls()

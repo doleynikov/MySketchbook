@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="ltr" lang="en"><head>
+<title>Arduino Basic - Hamsterworks Wiki!</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="MediaWiki 1.16.2">
+<meta name="robots" content="noindex,follow">
+<link rel="shortcut icon" href="http://hamsterworks.co.nz/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://hamsterworks.co.nz/mediawiki/opensearch_desc.php" title="Hamsterworks Wiki! (en)">
+<link rel="alternate" type="application/atom+xml" title="Hamsterworks Wiki! Atom feed" href="http://hamsterworks.co.nz/mediawiki/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="stylesheet" href="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/commonPrint.css" media="">
+<link rel="stylesheet" href="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/index_003.css">
+<link rel="stylesheet" href="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/index_004.css" media="">
+<link rel="stylesheet" href="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/index_002.css">
+<link rel="stylesheet" href="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/index.css">
+<script>
+var skin="monobook",
+stylepath="/mediawiki/skins",
+wgUrlProtocols="http\\:\\/\\/|https\\:\\/\\/|ftp\\:\\/\\/|irc\\:\\/\\/|gopher\\:\\/\\/|telnet\\:\\/\\/|nntp\\:\\/\\/|worldwind\\:\\/\\/|mailto\\:|news\\:|svn\\:\\/\\/",
+wgArticlePath="/mediawiki/index.php/$1",
+wgScriptPath="/mediawiki",
+wgScriptExtension=".php",
+wgScript="/mediawiki/index.php",
+wgVariantArticlePath=false,
+wgActionPaths={},
+wgServer="http://hamsterworks.co.nz",
+wgCanonicalNamespace="",
+wgCanonicalSpecialPageName=false,
+wgNamespaceNumber=0,
+wgPageName="Arduino_Basic",
+wgTitle="Arduino Basic",
+wgAction="view",
+wgArticleId=79,
+wgIsArticle=true,
+wgUserName=null,
+wgUserGroups=null,
+wgUserLanguage="en",
+wgContentLanguage="en",
+wgBreakFrames=false,
+wgCurRevisionId=2864,
+wgVersion="1.16.2",
+wgEnableAPI=true,
+wgEnableWriteAPI=true,
+wgSeparatorTransformTable=["", ""],
+wgDigitTransformTable=["", ""],
+wgMainPageTitle="Main Page",
+wgFormattedNamespaces={"-2": "Media", "-1": "Special", "0": "", "1": "Talk", "2": "User", "3": "User talk", "4": "Hamsterworks Wiki!", "5": "Hamsterworks Wiki! talk", "6": "File", "7": "File talk", "8": "MediaWiki", "9": "MediaWiki talk", "10": "Template", "11": "Template talk", "12": "Help", "13": "Help talk", "14": "Category", "15": "Category talk"},
+wgNamespaceIds={"media": -2, "special": -1, "": 0, "talk": 1, "user": 2, "user_talk": 3, "hamsterworks_wiki!": 4, "hamsterworks_wiki!_talk": 5, "file": 6, "file_talk": 7, "mediawiki": 8, "mediawiki_talk": 9, "template": 10, "template_talk": 11, "help": 12, "help_talk": 13, "category": 14, "category_talk": 15, "image": 6, "image_talk": 7},
+wgSiteName="Hamsterworks Wiki!",
+wgCategories=[],
+wgRestrictionEdit=[],
+wgRestrictionMove=[];
+</script><script src="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/wikibits.js"></script>
+<script src="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/ajax.js"></script>
+<script src="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/index.php"></script>
+
+</head>
+<body class="mediawiki ltr ns-0 ns-subject page-Arduino_Basic skin-monobook">
+<div id="globalWrapper">
+<div id="column-content"><div id="content">
+	<a id="top"></a>
+	
+	<h1 id="firstHeading" class="firstHeading">Arduino Basic</h1>
+	<div id="bodyContent">
+		<h3 id="siteSub">From Hamsterworks Wiki!</h3>
+		<div id="contentSub"></div>
+		<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>
+		<!-- start content -->
+<p>This is my port of TinyBasic from 68K assembler to the <a href="http://hamsterworks.co.nz/mediawiki/index.php/Arduino" title="Arduino">Arduino</a> platform.
+</p><p><a href="http://hamsterworks.co.nz/mediawiki/index.php/File:Tinybasic_screenshot.png" class="image"><img alt="Tinybasic screenshot.png" src="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/Tinybasic_screenshot.png" height="424" width="675"></a>
+</p>
+<table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a href="javascript:toggleToc()" class="internal" id="togglelink">hide</a>]</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#News_flash.21"><span class="tocnumber">1</span> <span class="toctext">News flash!</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#The_project_sketch_.2F_source_file"><span class="tocnumber">2</span> <span class="toctext">The project sketch / source file</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#What_I.27ve_been_running_it_on"><span class="tocnumber">3</span> <span class="toctext">What I've been running it on</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="#The_original_source"><span class="tocnumber">4</span> <span class="toctext">The original source</span></a></li>
+<li class="toclevel-1 tocsection-5"><a href="#Moving_to_a_different_environment"><span class="tocnumber">5</span> <span class="toctext">Moving to a different environment</span></a></li>
+<li class="toclevel-1 tocsection-6"><a href="#A_quick_note_on_tiny_basic"><span class="tocnumber">6</span> <span class="toctext">A quick note on tiny basic</span></a></li>
+<li class="toclevel-1 tocsection-7"><a href="#Adding_new_keywords_or_functions"><span class="tocnumber">7</span> <span class="toctext">Adding new keywords or functions</span></a>
+<ul>
+<li class="toclevel-2 tocsection-8"><a href="#Adding_a_statement"><span class="tocnumber">7.1</span> <span class="toctext">Adding a statement</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="#Adding_a_function"><span class="tocnumber">7.2</span> <span class="toctext">Adding a function</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-10"><a href="#Memory_layout_issue"><span class="tocnumber">8</span> <span class="toctext">Memory layout issue</span></a></li>
+<li class="toclevel-1 tocsection-11"><a href="#My_Arduino_TinyBasic_to-do_list"><span class="tocnumber">9</span> <span class="toctext">My Arduino TinyBasic to-do list</span></a></li>
+<li class="toclevel-1 tocsection-12"><a href="#The_source_code"><span class="tocnumber">10</span> <span class="toctext">The source code</span></a></li>
+<li class="toclevel-1 tocsection-13"><a href="#Updated_version"><span class="tocnumber">11</span> <span class="toctext">Updated version</span></a></li>
+</ul>
+</td></tr></tbody></table><script>if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<h2> <span class="mw-headline" id="News_flash.21"> News flash! </span></h2>
+<p>Somebody has taken this project and run with it...
+</p><p><a href="https://github.com/BleuLlama/TinyBasicPlus" class="external free" rel="nofollow">https://github.com/BleuLlama/TinyBasicPlus</a>
+</p><p>Plenty of enhancements and fixes - thanks Scott!
+</p>
+<h2> <span class="mw-headline" id="The_project_sketch_.2F_source_file"> The project sketch / source file </span></h2>
+<p>Here is the arduino project <a href="http://hamsterworks.co.nz/mediawiki/index.php/File:Tinybasic.pde" title="File:Tinybasic.pde">File:Tinybasic.pde</a>. Just rename it to .cpp for use in other environments.
+</p>
+<h2> <span class="mw-headline" id="What_I.27ve_been_running_it_on"> What I've been running it on </span></h2>
+<p>I'm running it on an Arduino Mini Pro and my Pololu 3pi robot, both 
+AVRmega parts. But it is in generic C, and can be compiled under Visual 
+Studio or GCC for testing/development purposes, and should move to any 
+of the larger microcontrollers with ease.
+</p><p>As is it currently configured for the Arduino environment, but 
+should you wish to move it to a different platform it should be 
+relatively easy. It compiles fine in AVR studio...
+</p><p>If you really want to get it up and running fast, get a Seeeduino
+ or Arduino Uno and be running in seconds with no special hardware. 
+</p>
+<h2> <span class="mw-headline" id="The_original_source"> The original source </span></h2>
+<p>This project is based on the TinyBasic source from <a href="http://members.shaw.ca/gbrandly/68ktinyb.html" class="external free" rel="nofollow">http://members.shaw.ca/gbrandly/68ktinyb.html</a>.
+</p>
+<h2> <span class="mw-headline" id="Moving_to_a_different_environment"> Moving to a different environment </span></h2>
+<p>The required customisation is as follows
+- An "unsigned char inchar()" function is needed to read a character from the input device.
+- A "void outchar()" function is needed to write to the output device
+- Adjust the size of "program[]" to use up as much memory as you dare (you need to leave some for the CPU stack though)
+- Just call "loop()" when you have initialised your hardware. 
+</p><p>Ardinuo appends the equivalent of
+</p>
+<pre> int main(void)
+ {
+   setup();
+   while(1)
+     loop();
+ }
+</pre>
+<p>which you may need to add depending on your target environment.
+</p>
+<h2> <span class="mw-headline" id="A_quick_note_on_tiny_basic"> A quick note on tiny basic </span></h2>
+<p>TinyBASIC is a little odd. It has no 'THEN' in the IF statement, and 
+its syntax doesn't allow unary for minus anywhere other than the start 
+of an expression. (i.e. A = 1*-2 is bad, but A=-1*2 is OK).
+</p>
+<h2> <span class="mw-headline" id="Adding_new_keywords_or_functions"> Adding new keywords or functions </span></h2>
+<p>As provided, the interpreter is good for nothing - you will need to 
+add your own statements or functions to do useful stuff. For my 3pi I've
+ added "MOTORS x,y", "DELAY &lt;ms&gt;" and "SENSORS()". Because these 
+are platform dependant I haven't included them.
+</p>
+<h3> <span class="mw-headline" id="Adding_a_statement"> Adding a statement </span></h3>
+<ul><li> Add your word into keywords[] before the trailing 0, adding the 0x80 to the final character.
+</li><li> define a new unique KW_&lt;keyword&gt; #define following the table.
+</li><li> Add your keyword specific code to the switch() construct following "interperateAtTxtpos:"
+</li><li> "POKE" and "GOTO" make a good template of how to do things.
+</li></ul>
+<h3> <span class="mw-headline" id="Adding_a_function"> Adding a function </span></h3>
+<ul><li> Add your function name into func_tab[] before the trailing 0, adding the 0x80 to the final character.
+</li><li> define a new unique FUNC_&lt;name&gt; #define following the table
+</li><li> Add your function dependant code into the "switch(f)" in the expr4() function.
+</li></ul>
+<h2> <span class="mw-headline" id="Memory_layout_issue"> Memory layout issue </span></h2>
+<p>The original TinyBASIC memory layout is wrong.
+</p>
+<ul><li> Basic code (Dynamic, grows up)
+</li><li> Free space
+</li><li> Variables (Fixed size)
+</li><li> Program maintained call stack. (Fixed size, grows down)
+</li></ul>
+<p>I've shuffled this around...
+</p>
+<ul><li> Variables (Fixed size)
+</li><li> Basic code (Dynamic, grows up)
+</li><li> Free space
+</li><li> Program maintained call stack. (Dynamic, grows down)
+</li></ul>
+<p>This allows for a deeper FOR/GOSUB call stack - a small programs will leave a deep stack.
+</p>
+<h2> <span class="mw-headline" id="My_Arduino_TinyBasic_to-do_list"> My Arduino TinyBasic to-do list </span></h2>
+<p>None of this stuff will get done, but if others are interested in doing something...
+</p>
+<ul><li> The program memory space is set at compile time (see "static 
+unsigned char program[412];). I have this at more than than 1412 on an 
+AVR with 2k RAM.
+</li></ul>
+<ul><li> There are still a lot of tidy-ups to do to reduce code size.
+</li></ul>
+<ul><li> GetLn might not handle most special characters correctly (NL &amp; CR, DEL vs CTRL+H, CTRL+C and others).
+</li></ul>
+<ul><li> I'm not sure that the static constants such as tables end up in program memory. AVR studio reports it better during the build.
+</li></ul>
+<ul><li> The expression evaluator is recursive, and doesn't check how 
+much stack is available. As I don't know how big the CPU stack is a 
+really deep expression (eg "A=((((((((((B)))))))))") may crash it.
+</li></ul>
+<ul><li> Still tossing a coin on what to do for LOAD and SAVE... perhaps
+ store program in EEPROM, but EEPROM is only half the size of RAM. 
+Perhaps by using tokens it will take more...
+</li></ul>
+<ul><li> No keywords to access the standard Arduino hardware have been 
+added - I'm thinking of "DELAY &lt;ms&gt;",  "DOUT 
+&lt;pin&gt;,&lt;value&gt;" and "AOUT &lt;pin&gt;,&lt;value&gt; " 
+statements and a "DIN(&lt;PIN&gt;)" and "AIN(&lt;PIN&gt;)" function at 
+least! Any suggestions / contributions would be great
+</li></ul>
+<ul><li> POKE() is poked&nbsp;:-). But it is a template for future expansion.
+</li></ul>
+<ul><li> Might be some weirdness, like <i>IF A=B GOTO 99: PRINT "Hi"</i> might fail oddly.
+</li></ul>
+<ul><li> I bet I sometimes call the wrong error routines (e.g. "qhow" 
+and "qwhat") , but I plan on making these more explicit (e.g. "Syntax 
+error", "Divide by zero", "Out of memory"...)
+</li></ul>
+<ul><li> Testing, testing, testing...
+</li></ul>
+<p>Please let me know if you have any success and of any bugs you fix!&nbsp;:-)
+</p>
+<h2> <span class="mw-headline" id="The_source_code"> The source code </span></h2>
+<p>It is here at <a href="http://hamsterworks.co.nz/mediawiki/index.php/Tinybasic_source" title="Tinybasic source">tinybasic_source</a>
+</p>
+<h2> <span class="mw-headline" id="Updated_version"> Updated version </span></h2>
+<p>Here's a version provided by Scott Lawrence: <a href="http://hamsterworks.co.nz/mediawiki/index.php/File:Tinybasicplus.zip" title="File:Tinybasicplus.zip">File:Tinybasicplus.zip</a>
+</p>
+<pre>Attached is an updated version of your BASIC that adds a few things:
+
+Support for the SD Library.  I've tested it with a Seeeduino SD Shield
+(Which i snagged at Radio Shack for $13).
+New additions:
+FILES   - displays a list of files in the root of the SD card (seems
+to misbehave after a lot of IO for some reason)
+LOAD - load a file in as a program
+SAVE - save a file out
+MEM - display the amount of free memory currently available.
+? - synonymous with PRINT.  Save a few bytes in your program by using
+this standard shortener!
+
+I was noticing some quirks with it;
+- INPUT seems broken.  not sure about this, i might just have the syntax wrong
+- LET A = A + B does not work, however LET A = A+B does work.
+
+I implemented LOAD and SAVE by having a global file pointer.  When you
+go to save a file, it opens the output file, and sets a flag that all
+output goes to the file instead of to the serial port.  Then it just
+does a standard file listing.  Similarly, when you load, it sets the
+input as from the file, then the getchar routine just sucks from the
+file instead of the serial line until there's nothing left.  It seems
+a bit quirky, I have yet to figure out exactly what the quirks are and
+fix them.
+
+For what it's worth, including the SD library eats 9k of program
+space, so I made it optional.
+#define ENABLE_FILEIO 1
+to turn it on.  Also, since some SD card shields have a different chip
+select line, I made that a #define at the top as well.
+
+</pre>
+<!-- 
+NewPP limit report
+Preprocessor node count: 54/1000000
+Post-expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key bitnami_mediawiki:pcache:idhash:79-0!1!0!!en!2!edit=0!printable=1 and timestamp 20161125065517 -->
+<div class="printfooter">
+Retrieved from "<a href="http://hamsterworks.co.nz/mediawiki/index.php/Arduino_Basic">http://hamsterworks.co.nz/mediawiki/index.php/Arduino_Basic</a>"</div>
+		<div id="catlinks" class="catlinks catlinks-allhidden"></div>		<!-- end content -->
+				<div class="visualClear"></div>
+	</div>
+</div></div>
+<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Arduino_Basic" title="View the content page [alt-shift-c]" accesskey="c">Page</a></li>
+				 <li id="ca-talk" class="new"><a href="http://hamsterworks.co.nz/mediawiki/index.php?title=Talk:Arduino_Basic&amp;action=edit&amp;redlink=1" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></li>
+				 <li id="ca-viewsource"><a href="http://hamsterworks.co.nz/mediawiki/index.php?title=Arduino_Basic&amp;action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></li>
+				 <li id="ca-history"><a href="http://hamsterworks.co.nz/mediawiki/index.php?title=Arduino_Basic&amp;action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">History</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="http://hamsterworks.co.nz/mediawiki/index.php?title=Special:UserLogin&amp;returnto=Arduino_Basic&amp;returntoquery=printable%3Dyes" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/mediawiki/skins/common/images/hamsterworks.png);" href="http://hamsterworks.co.nz/mediawiki/index.php/Main_Page" title="Visit the main page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class="pBody">
+			<ul>
+				<li id="n-mainpage-description"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main page</a></li>
+				<li id="n-portal"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Hamsterworks_Wiki%21:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li>
+				<li id="n-currentevents"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Hamsterworks_Wiki%21:Current_events" title="Find background information on current events">Current events</a></li>
+				<li id="n-recentchanges"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Special:RecentChanges" title="The list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Special:Random" title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
+				<li id="n-help"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Help:Contents" title="The place to find out">Help</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="/mediawiki/index.php" id="searchform">
+				<input name="title" value="Special:Search" type="hidden">
+				<input id="searchInput" title="Search Hamsterworks Wiki!" accesskey="f" name="search" type="search">
+				<input name="go" class="searchButton" id="searchGoButton" value="Go" title="Go to a page with this exact name if exists" type="submit">&nbsp;
+				<input name="fulltext" class="searchButton" id="mw-searchButton" value="Search" title="Search the pages for this text" type="submit">
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Special:WhatLinksHere/Arduino_Basic" title="List of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Special:RecentChangesLinked/Arduino_Basic" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li>
+<li id="t-specialpages"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Special:SpecialPages" title="List of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li>
+				<li id="t-permalink"><a href="http://hamsterworks.co.nz/mediawiki/index.php?title=Arduino_Basic&amp;oldid=2864" title="Permanent link to this revision of the page">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+</div><!-- end of the left (by default at least) column -->
+<div class="visualClear"></div>
+<div id="footer">
+	<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="Arduino%20Basic%20-%20Hamsterworks%20Wiki%21_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" height="31" width="88"></a></div>
+	<ul id="f-list">
+		<li id="lastmod"> This page was last modified on 21 September 2012, at 09:02.</li>
+		<li id="viewcount">This page has been accessed 42,449 times.</li>
+		<li id="privacy"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Hamsterworks_Wiki%21:Privacy_policy" title="Hamsterworks Wiki!:Privacy policy">Privacy policy</a></li>
+		<li id="about"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Hamsterworks_Wiki%21:About" title="Hamsterworks Wiki!:About">About Hamsterworks Wiki!</a></li>
+		<li id="disclaimer"><a href="http://hamsterworks.co.nz/mediawiki/index.php/Hamsterworks_Wiki%21:General_disclaimer" title="Hamsterworks Wiki!:General disclaimer">Disclaimers</a></li>
+	</ul>
+</div>
+</div>
+
+<script>if (window.runOnloadHook) runOnloadHook();</script>
+<!-- Served in 0.382 secs. -->
+</body></html>

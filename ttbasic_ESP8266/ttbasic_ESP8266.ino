@@ -1,4 +1,5 @@
 /*
+ * Это рабочий интерпретатор для esp8266!
   TOYOSHIKI Tiny BASIC for Arduino
   (C)2012 Tetsuya Suzuki
 */
@@ -36,8 +37,7 @@ void setup(void) {
   server.begin();
   Serial.println("HTTP server started");
   server.handleClient();
-
-  host_display_init();
+  host_init();
 
 
 }

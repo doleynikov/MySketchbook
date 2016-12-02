@@ -49,6 +49,26 @@ short getrnd(short value) {
   return random(value) + 1;
 }
 
+
+char getlastchar(unsigned long val)
+      {
+      unsigned long st=millis()+val;
+      char ret=0;
+      while (!c_kbhit()) 
+      {
+        if ((millis()-st)>=0)
+        {
+          ret=0;
+          break;
+         }
+      }
+
+      while (c_kbhit()) {ret = c_getch();}
+      return ret;
+      } 
+
+
+
 // Prototypes (necessity minimum)
 short iexp(void);
 
@@ -61,11 +81,12 @@ const char *kwtbl[] = {
   ",", ";",
   "-", "+", "*", "/", "(", ")",
   ">=", "#", ">", "=", "<=", "<",
-  "@", "RND", "ABS", "SIZE",
+  "@", "RND", "ABS", "SIZE","INKEY",//last key from buffer
   "LIST", "RUN", "NEW",
   "SAVE",//extend
   "DIR",//extend
   "LOAD",//extend
+  
 };
 
 // Keyword count
@@ -80,13 +101,14 @@ enum {
   I_COMMA, I_SEMI,
   I_MINUS, I_PLUS, I_MUL, I_DIV, I_OPEN, I_CLOSE,
   I_GTE, I_SHARP, I_GT, I_EQ, I_LTE, I_LT,
-  I_ARRAY, I_RND, I_ABS, I_SIZE,
+  I_ARRAY, I_RND, I_ABS, I_SIZE,  I_INKEY,
   I_LIST, I_RUN, I_NEW,
   I_SAVE,//extend
   I_DIR,//extend
   I_LOAD,//extend
   I_NUM, I_VAR, I_STR,
   I_EOL
+
 };
 
 // List formatting condition
@@ -95,7 +117,7 @@ const unsigned char i_nsa[] = {
   I_RETURN, I_STOP, I_COMMA,
   I_MINUS, I_PLUS, I_MUL, I_DIV, I_OPEN, I_CLOSE,
   I_GTE, I_SHARP, I_GT, I_EQ, I_LTE, I_LT,
-  I_ARRAY, I_RND, I_ABS, I_SIZE
+  I_ARRAY, I_RND, I_ABS, I_SIZE, I_INKEY
 };
 
 // 前が定数か変数のとき前の空白をなくす中間コード
@@ -679,6 +701,14 @@ short ivalue() {
         break; //ここで打ち切る
       value = getrnd(value); //乱数を取得
       break; //ここで打ち切る
+
+    case I_INKEY: 
+      cip++; 
+      value = getparam(); 
+      if (err) 
+        break; 
+      value = getlastchar(value); 
+      break; 
 
     case I_ABS: //関数ABSの場合
       cip++; //中間コードポインタを次へ進める
@@ -1301,7 +1331,7 @@ void isave() {
     if (!f)
       Serial.println("file open failed");
     else {
-      Serial.println("====== Writing to SPIFFS file =========");
+      Serial.println("Write");
       for (int i = 0; i < SIZE_LIST + 1; i++) f.write( listbuf[i]);
       f.flush();
       f.close();
@@ -1332,7 +1362,7 @@ void iload() {
       Serial.println("file open failed");
     else {
       fSize = f.size();
-      Serial.println("====== Reading to SPIFFS file ========="+String(fSize));
+      Serial.println("Read:"+String(fSize));
       for (int i = 0; i < fSize + 1; i++)
         listbuf[i] = f.read();
       f.close();
@@ -1371,12 +1401,6 @@ void idir() {
   }
     SPIFFS.end();
   }
-
-
-
-
-
-
 
   //unsigned char bootflag() {
   //  EEPROM.begin(SIZE_LIST + 1);
@@ -1469,10 +1493,12 @@ void idir() {
       }
     } //もし「OK」ではなかったらの末尾
 
+    if (err!=0){
     newline(); //改行
     c_puts(errmsg[err]); //「OK」またはエラーメッセージを表示
     newline(); //改行
     err = 0; //エラー番号をクリア
+    }
   }
 
   /*
