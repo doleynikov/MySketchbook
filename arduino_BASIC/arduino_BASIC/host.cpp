@@ -232,4 +232,15 @@ void host_loadProgram() {
         mem[i] = EEPROM.read(i+3);
 }
 
+void host_moveCursor(int first,int second)
+{
+  //unimplemented yet
+  } 
+
+void    host_cls()
+{
+  //unimplemented yet
+
+}
+
 

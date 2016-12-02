@@ -26,6 +26,11 @@ bool host_ESCPressed();
 void host_outputFreeMem(unsigned int val);
 void host_saveProgram(bool autoexec);
 void host_loadProgram();
+void host_moveCursor(int first,int second);
+void host_cls();
+  //unimplemented yet
+
+
 
 
 
